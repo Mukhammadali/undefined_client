@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Volunteer from "./contracts/Volunteer.json";
 import getWeb3 from "./utils/getWeb3";
+import { Spin } from 'antd'
 
 import "./App.css";
 import Router from "./Router/Router.js";
@@ -15,10 +16,7 @@ class App extends Component {
     try {
       
       const web3 = await getWeb3();
-
-     
       const accounts = await web3.eth.getAccounts();
-
       
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = Volunteer.networks[networkId];
@@ -39,9 +37,7 @@ class App extends Component {
   };
 
   render() {
-    // if (!this.state.web3) {
-    //   return <div>Loading Web3, accounts, and contract...</div>;
-    // }
+    if (!this.state.contract) return <Spin size="large" />
     return (
       <AppContext.Provider value={this.state}>
         <Router />;

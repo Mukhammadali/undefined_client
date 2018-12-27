@@ -2,13 +2,14 @@ import React from 'react'
 import { Modal, Row } from 'antd';
 
 const DetailsModal = props => {
-  const { modalVisible, service, toggleModal } = props;
+  const { modalVisible, service, toggleModal, chosenServiceIndex } = props;
+  if (!service) return null;
   return (
     <Modal
       visible={modalVisible}
       title={`${service.serviceName}`}
       width={800}
-      onCancel={() => toggleModal(false, 0)}
+      onCancel={() => toggleModal(false, chosenServiceIndex)}
       footer={null}
     >
       <Row type="flex" align="middle" justify="space-between">
