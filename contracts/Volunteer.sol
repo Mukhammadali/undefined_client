@@ -184,10 +184,16 @@ contract Volunteer {
 
     function getStudent(uint id) public view returns(uint, uint, string memory) {
         require(studentExists(id), "Student does not exist.");
+        uint i = 0;
+        for(i; i < studentsCount; i++){
+            if(students[i].id == id){
+                break;
+            }
+        }
         return(
-            id,
-            students[id].id,
-            students[id].name
+            i,
+            students[i].id,
+            students[i].name
         );
     }
 
