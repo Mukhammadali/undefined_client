@@ -30,7 +30,7 @@ contract Volunteer {
     uint public volunteeringsCount;
 
 
-    function addService (uint _id, uint _max, uint _current string memory _name) private {
+    function addService (uint _id, uint _max, uint _current, string memory _name) private {
         servicesCount ++;
         services.push(Service({
             id: _id,
@@ -75,60 +75,63 @@ contract Volunteer {
 
     // Setters
 
-    function setService(string name) public {
-      addService(services.length, name);
+    function setService(string memory name, uint max, uint current) public {
+        addService(services.length, max, current, name);
     }
 
-    function setStudent(string name) public {
-      addStudent(students.length, name);
+    function setStudent(string memory name) public {
+        addStudent(students.length, name);
     }
 
-    function setVolunteering(uint x, uint y) public {
-      addVolunteering(x,y);
+    function setVolunteering(uint studentID, uint serviceID) public {
+        addVolunteering(studentID, serviceID);
     }
 
     // Getters
 
     function getService(uint id) public view
-      returns(
+        returns(
         uint,
-        string
-      ) {
+        uint, 
+        uint,
+        string memory
+        ) {
         return(
-          id,
-          services[id].maxNum,
-          services[id].currentNum,
-          services[id].name
+            id,
+            services[id].maxNum,
+            services[id].currentNum,
+            services[id].name
         );
-      }
+    }
 
     function getStudent(uint id) public view
-      returns(
+        returns(
         uint,
-        string
-      ) {
+        string memory
+        ) {
         return(
-          id,
-          services[id].name
+            id,
+            students[id].name
         );
-      }
+    }
 
     function getVolunteering(uint id) public view
-      returns(
+        returns(
         uint,
         uint,
-        string
-      ) {
+        bool
+        ) {
         return(
-          id,
-          services[id].name
+            volunteerings[id].studentID,
+            volunteerings[id].serviceID,
+            volunteerings[id].completed
         );
-      }
+    }
 
 
     // Constructor
     constructor () public {
-        addService(1, "Sample Service");
+        addService(1, 20, 10, "Sample Service");
         addStudent(1, "Sample Student");
         addVolunteering(0, 0);
     }
