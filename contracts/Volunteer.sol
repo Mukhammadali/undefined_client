@@ -112,6 +112,11 @@ contract Volunteer {
 
     function completeService(uint serviceID) public {
         services[serviceID].completed = true;
+        for(uint i = 0; i < volunteeringsCount; i++){
+            if(volunteerings[i].serviceID == serviceID){
+                volunteerings[i].completed = true;
+            }
+        }
         emit ApproveServiceCompletion(serviceID);
     }
 
