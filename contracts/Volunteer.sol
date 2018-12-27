@@ -7,6 +7,7 @@ contract Volunteer {
         uint maxNum; // Max students who can enroll
         uint currentNum; // Current enrolled students
         string name;
+        bool completed;
     }
 
     struct Student {
@@ -36,7 +37,8 @@ contract Volunteer {
             id: _id,
             maxNum: _max,
             currentNum: _current,
-            name: _name
+            name: _name,
+            completed: false
         }));
     }
 
@@ -59,10 +61,16 @@ contract Volunteer {
         emit EstablishVolunteering(studentID, serviceID);
     }
 
-    function completeVolunteering(uint volunteeringID) private {
+    function completeVolunteering(uint volunteeringID) public {
         volunteerings[volunteeringID].completed = true;
         emit ApproveVolunteeringCompletion(volunteeringID);
     }
+
+    function completeService(uint serviceID) public {
+        services[serviceID].completed = true;
+        emit ApproveServiceCompletion(serviceID);
+    }
+
 
     event EstablishVolunteering (
         uint indexed _studentID,
@@ -71,6 +79,10 @@ contract Volunteer {
 
     event ApproveVolunteeringCompletion(
         uint indexed _volunteeringID
+    );
+
+    event ApproveServiceCompletion(
+        uint indexed _serviceID
     );
 
     // Setters
@@ -84,6 +96,10 @@ contract Volunteer {
     }
 
     function setVolunteering(uint studentID, uint serviceID) public {
+        require(
+            studentID < studentsCount && serviceID < servicesCount,
+            "Invalid ID of student or service"
+        );
         addVolunteering(studentID, serviceID);
     }
 
@@ -94,13 +110,15 @@ contract Volunteer {
         uint,
         uint, 
         uint,
-        string memory
+        string memory,
+        bool
         ) {
         return(
             id,
             services[id].maxNum,
             services[id].currentNum,
-            services[id].name
+            services[id].name,
+            services[id].completed
         );
     }
 
@@ -131,8 +149,13 @@ contract Volunteer {
 
     // Constructor
     constructor () public {
-        addService(1, 20, 10, "Sample Service");
-        addStudent(1, "Sample Student");
-        addVolunteering(0, 0);
+        setService("Service1", 20, 10);
+        setStudent("Student1");
+
+        setService("Service2", 10, 5);
+        setStudent("Student2");
+
+        setService("Service3", 15, 7);
+        setStudent("Student3");
     }
 }
