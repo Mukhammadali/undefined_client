@@ -29,7 +29,8 @@
     "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
-    "start": "react-app-rewired start",
+    "pre-start": "truffle compile && truffle migrate --reset",
+    "start": "npm run pre-start && react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject"

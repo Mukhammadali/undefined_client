@@ -12,6 +12,12 @@ const resolvers = {
       cache.writeData({ data: { loggedIn: false } });
       return null;
     },
+    clientStoreContract: async (_, data, { cache }) => {
+      console.log('storeContract', data);
+      // await resetToken();
+      // cache.writeData({ data: { loggedIn: false } });
+      return null;
+    },
   }
 };
 

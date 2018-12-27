@@ -19,6 +19,9 @@ const Router = ({ data }) => {
           width: '100vw',
           overflow: 'hidden',
           background: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}
       >
         <Switch>
