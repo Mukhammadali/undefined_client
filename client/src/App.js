@@ -16,7 +16,14 @@ class App extends Component {
     try {
       
       const web3 = await getWeb3();
+<<<<<<< Updated upstream
       const accounts = await web3.eth.getAccounts();
+=======
+
+     
+      const accounts = await web3.eth.getAccounts();
+
+>>>>>>> Stashed changes
       
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = Volunteer.networks[networkId];
@@ -37,7 +44,13 @@ class App extends Component {
   };
 
   render() {
+<<<<<<< Updated upstream
     if (!this.state.contract) return <Spin size="large" />
+=======
+    // if (!this.state.web3) {
+    //   return <div>Loading Web3, accounts, and contract...</div>;
+    // }
+>>>>>>> Stashed changes
     return (
       <AppContext.Provider value={this.state}>
         <Router />;

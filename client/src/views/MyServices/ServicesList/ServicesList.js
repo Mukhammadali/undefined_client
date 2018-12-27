@@ -12,8 +12,8 @@ console.log('Volunteer', Volunteer);
 console.log('getWeb3', getWeb3);
 
 const columns = [
-  { title: 'Service Name', dataIndex: 'serviceName', width: '50%' },
-  { title: 'Credit Amount', dataIndex: 'creditAmount' },
+  { title: 'Service Name', dataIndex: 'serviceName', key: 'serviceName', width: '50%' },
+  { title: 'Credit Amount', dataIndex: 'creditAmount', key: 'creditAmount' },
   // { title: 'No', dataIndex: 'usersCount', key: 'usersCount', render: (text, record, index) => {
   //   return (
   //     <span>{record.usersCount} / <b>{record.max}</b></span>
