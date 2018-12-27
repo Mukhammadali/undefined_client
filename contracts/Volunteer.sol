@@ -99,7 +99,7 @@ contract Volunteer {
     }
 
     // Creates new service and binds it to existing Service Provider
-    function addServiceToServiceProvider(uint sp_id, string memory s_name, string memory s_description, uint s_max, uint s_current, uint s_credits) public {
+    function addServiceToServiceProvider(uint sp_id, string memory s_name, uint s_max, uint s_current, uint s_credits, string memory s_description) public {
         setService(s_name, s_description, s_max, s_current, s_credits, sp_id);
         serviceProviders[sp_id].services[serviceProviders[sp_id].numberOfServices] = services[servicesCount-1];
         serviceProviders[sp_id].numberOfServices++;
@@ -169,22 +169,31 @@ contract Volunteer {
 
     function getService(uint id) public view
         returns(
+        uint,
         uint, 
         uint,
-        string memory,
         string memory,
         bool,
         uint,
         uint
         ) {
         return(
+            id,
             services[id].maxNum,
             services[id].currentNum,
             services[id].name,
-            services[id].description,
             services[id].completed,
             services[id].credits,
             services[id].providerID
+        );
+    }
+
+    function getServiceDescription(uint id) public view
+        returns(
+        string memory
+        ) {
+        return(
+            services[id].description
         );
     }
 
@@ -272,14 +281,14 @@ contract Volunteer {
         setStudent(16013086, "Student2");
         setStudent(16014086, "Student3");
 
-        addServiceToServiceProvider(1501010, "ServiceOfProvider1", "Description to ServiceOfProvider1",  10, 0, 4);
-        addServiceToServiceProvider(1501010, "ServiceOfProvider1_2", "Description to ServiceOfProvider1_2", 10, 0, 4);
+        addServiceToServiceProvider(1501010, "ServiceOfProvider1", 10, 0, 4, "Description to ServiceOfProvider1");
+        addServiceToServiceProvider(1501010, "ServiceOfProvider1_2",10, 0, 4, "Description to ServiceOfProvider1_2");
 
-        addServiceToServiceProvider(1501011, "ServiceOfProvider2", "Description to ServiceOfProvider2", 8, 0, 9);
-        addServiceToServiceProvider(1501011, "ServiceOfProvider2_2", "Description to ServiceOfProvider2_2", 8, 0, 9);
+        addServiceToServiceProvider(1501011, "ServiceOfProvider2", 8, 0, 9, "Description to ServiceOfProvider1_2");
+        addServiceToServiceProvider(1501011, "ServiceOfProvider2_2", 8, 0, 9, "Description to ServiceOfProvider1_2");
 
-        addServiceToServiceProvider(1501012, "ServiceOfProvider3", "Description to ServiceOfProvider3", 3, 0, 1);
-        addServiceToServiceProvider(1501012, "ServiceOfProvider3_2", "Description to ServiceOfProvider3_2", 3, 0, 1);
+        addServiceToServiceProvider(1501012, "ServiceOfProvider3", 3, 0, 1, "Description to ServiceOfProvider1_2");
+        addServiceToServiceProvider(1501012, "ServiceOfProvider3_2", 3, 0, 1, "Description to ServiceOfProvider1_2");
     
     }
 }
