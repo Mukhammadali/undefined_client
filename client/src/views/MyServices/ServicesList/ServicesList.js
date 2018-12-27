@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Table, Spin } from 'antd';
+import { Table, Spin, Tag } from 'antd';
 // import data from './mockData';
 // import getWeb3 from "../../../utils/getWeb3";
 import Volunteer from '../../../contracts/Volunteer.json';
@@ -14,17 +14,17 @@ console.log('getWeb3', getWeb3);
 const columns = [
   { title: 'Service Name', dataIndex: 'serviceName', key: 'serviceName', width: '50%' },
   { title: 'Credit Amount', dataIndex: 'creditAmount', key: 'creditAmount' },
+  { title: 'No', dataIndex: 'usersCount', key: 'usersCount', render: (text, record, index) => {
+    return (
+      <span>{record.usersCount} / <b>{record.max}</b></span>
+    )
+  } },
   { title: 'Status', dataIndex: 'completed', key: 'completed', render: (text, { completed }) => {
     console.log('completed', completed);
-    if(completed) return <span style={{ color: 'green' }}>Completed</span>
-    return <span style={{ color: 'blue' }}>In Progress</span>
+    if(completed) return <Tag color="green">Completed</Tag>
+    return <Tag color="blue">In Progress</Tag>
 
   } },
-  // { title: 'No', dataIndex: 'usersCount', key: 'usersCount', render: (text, record, index) => {
-  //   return (
-  //     <span>{record.usersCount} / <b>{record.max}</b></span>
-  //   )
-  // } },
 ];
 
 

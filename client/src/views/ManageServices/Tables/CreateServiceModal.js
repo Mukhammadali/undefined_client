@@ -3,25 +3,24 @@ import { Modal, Row, Form, Input } from 'antd';
 import styled from 'styled-components';
 import { compose, withHandlers } from 'recompose';
 
-const EditableDetailsModal = props => {
-  const { modalVisible, service, toggleModal, chosenServiceIndex, form, onUpdate } = props;
+const CreateServiceModal = props => {
+  const { modalVisible, toggleModal, form, onCreate } = props;
   const { getFieldDecorator } = form;
-  if (!service) return null;
   return (
     <Modal
       visible={modalVisible}
-      title={`${service.serviceName}`}
-      okText="Update"
+      title="Create New Voluntary Service"
+      okText="Create"
       width={800}
-      onCancel={() => toggleModal(false, chosenServiceIndex)}
-      onOk={onUpdate}
+      onCancel={() => toggleModal(false)}
+      onOk={onCreate}
     >
       <Row type="flex" align="middle" justify="space-between">
         <Form.Item label="Name of the Service:" required>
           {
             getFieldDecorator('serviceName',{
               rules: [{ required: true, message: 'Service Name is required' }],
-              initialValue: service.serviceName
+              initialValue: ''
             })(
               <StyledInput placeholder="Enter service name" />
             )
@@ -31,7 +30,7 @@ const EditableDetailsModal = props => {
           {
             getFieldDecorator('max',{
               rules: [{ required: true, message: 'Max Number is required' }],
-              initialValue: service.max
+              initialValue: ''
             })(
               <StyledInput placeholder="Enter maximum number" />
             )
@@ -43,7 +42,7 @@ const EditableDetailsModal = props => {
           {
             getFieldDecorator('description',{
               rules: [{ required: true, message: 'Description is required' }],
-              initialValue: service.description
+              initialValue: ''
             })(
               <Input.TextArea
                 placeholder="Enter description here..."
@@ -61,9 +60,9 @@ const EditableDetailsModal = props => {
 export default compose(
   Form.create(),
   withHandlers({
-    onUpdate: props => async () => {
+    onCreate: props => async () => {
       console.log('Clicked');
-      const { form, updateService } = props;
+      const { form, createService } = props;
       await form.validateFields((formErr, values) => {
         if(!formErr) {
           console.log({ values });
@@ -71,7 +70,7 @@ export default compose(
       })
     }
   })
-)(EditableDetailsModal)
+)(CreateServiceModal)
 
 
 const StyledInput = styled(Input)`

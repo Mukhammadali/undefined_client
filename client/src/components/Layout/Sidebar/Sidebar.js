@@ -26,10 +26,10 @@ const allSidebarLinks = [
     to: '/main/my-voluntary-services',
   },
   {
-    key: 'option-1',
-    iconName: 'user',
-    title:'Option 1',
-    to: '/main/option-1',
+    key: 'registered-students',
+    iconName: 'team',
+    title:'Registered Students',
+    to: '/main/registered-students',
   },
   {
     key: 'option-2',
@@ -41,7 +41,7 @@ const allSidebarLinks = [
 ];
 
 const studentHasAccess = ['enroll-voluntary-service', 'my-voluntary-services'];
-const providerAccess = ['manage-services', 'option-1', 'option-2'];
+const providerAccess = ['manage-services', 'registered-students', 'option-2'];
 
 const studentAllowedLinks = allSidebarLinks.filter(link =>
   studentHasAccess.includes(link.key)

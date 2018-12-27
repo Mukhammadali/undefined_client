@@ -1,14 +1,13 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Table, Button, Row, message, Icon } from 'antd';
-import EditableDetailsModal from './EditableDetailsModal';
+import CreateServiceModal from './CreateServiceModal';
 
 
 export default class ServicesTableForProvider extends Component {
   state = {
     loading: false,
     modalVisible: false,
-    chosenServiceIndex: null,
     contract: null,
     services: [],
     columns: [
@@ -34,18 +33,17 @@ export default class ServicesTableForProvider extends Component {
       },
     ],
   }
-  updateService = async serviceId => {
-    console.log('serviceId', serviceId);
-    const { web3: { contract, accounts }, user } = this.props;
-    try {
-      await contract.methods.setVolunteering(user.userId, serviceId).send({ from: accounts[0] });
-      await  message.success('Successfully Updated!')
-      await this.toggleModal(false, this.state.chosenServiceIndex);
-    }
-    catch (err) {
-      console.error(err);
-      message.error('Something went wrong! Please try again!')
-    }
+  createService = async values => {
+    // const { web3: { contract, accounts }, user } = this.props;
+    // try {
+    //   await contract.methods.setVolunteering(user.userId, serviceId).send({ from: accounts[0] });
+    //   await  message.success('Successfully Updated!')
+    //   await this.toggleModal(false, this.state.chosenServiceIndex);
+    // }
+    // catch (err) {
+    //   console.error(err);
+    //   message.error('Something went wrong! Please try again!')
+    // }
   }
   async componentDidMount (){
     this.setState({ loading: true }); 
@@ -91,6 +89,7 @@ export default class ServicesTableForProvider extends Component {
     await this.setState({ loading: false })
     for (let index = 0; index < servicesLength; index++) {
       const response = await contract.methods.getService(index).call();
+      console.log('response', response);
       const payload = {
         id: response[0],
         max: response[1],
@@ -104,13 +103,19 @@ export default class ServicesTableForProvider extends Component {
     return allServices;
   }
   
-  toggleModal = (bool, index) => this.setState({ modalVisible: bool, chosenServiceIndex: index });
+  toggleModal = (bool) => this.setState({ modalVisible: bool });
 
   render() {
     const { modalVisible, columns, chosenServiceIndex, services, loading } = this.state;
     return (
       <div>
-        <Button  type="primary" ghost><Icon type="plus" /> Create Service</Button>
+        <Button
+          type="primary"
+          style={{ marginBottom: 10 }}
+          onClick={() => this.toggleModal(true)}
+        >
+          <Icon type="plus" /> Create Service
+        </Button>
         <Table
           columns={columns}
           dataSource={services}
@@ -118,12 +123,10 @@ export default class ServicesTableForProvider extends Component {
           loading={loading}
           rowKey="id"
         />
-        <EditableDetailsModal
+        <CreateServiceModal
           modalVisible={modalVisible}
-          service={services[chosenServiceIndex]}
-          chosenServiceIndex={chosenServiceIndex}
           toggleModal={this.toggleModal}
-          updateService={this.updateService}
+          createService={this.createService}
         />
       </div>
     )

@@ -14,8 +14,8 @@ const ProviderRoutes = props => {
       <Route exact path="/main/manage-services">
         <ManageServices user={user} title="Manage Services"/>
       </Route>
-      <Route exact path="/main/option-1">
-        <div>Option 2</div>
+      <Route exact path="/main/registered-students">
+        <div>Registered Students</div>
       </Route>
       <Route exact path="/main/option-2">
         <div>Option 3</div>
