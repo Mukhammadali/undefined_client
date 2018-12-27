@@ -70,9 +70,10 @@ const Sidebar = props => {
       breakpoint="lg"
       width={260}
     >
-      <UserName>
-        {user.userName}
-      </UserName>
+      <SidebarHeader>
+        <Logo src={require('../../../lib/assets/SejongLogo.gif')} alt="logo"/>
+        <h2>Sejong University</h2>
+      </SidebarHeader>
       <Menu theme="dark" mode="inline" selectedKeys={[pathname.split('/')[2]]}>
         {currentSidebarLinks.map(link => (
           <StyledMenuItem key={link.key}>
@@ -111,10 +112,22 @@ const StyledMenuItem = styled(Menu.Item)`
   white-space: nowrap;
   flex: 1;
 `;
-const UserName = styled.div`
+const Logo = styled.img`
   color: #fff;
-  font-size: 30px;
-  height: 64px;
-  line-height: 64px;
+  height: 54px;
+  line-height: 54px;
   text-align: center;
+  margin-right: 10px;
+`;
+
+const SidebarHeader = styled.div`
+  display: flex;
+  height: 64px;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  h2 {
+    margin-top: none !important;
+    margin-bottom: none !important;
+  }
 `;
