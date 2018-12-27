@@ -71,7 +71,7 @@ contract Volunteer {
         services[serviceID].currentNum++;
 
         volunteerings.push(Volunteering({
-            studentID: studentID,
+            studentID: students[studentID].id,
             serviceID: serviceID,
             completed: false
         }));
@@ -117,16 +117,27 @@ contract Volunteer {
         addService(services.length, max, current, name, credits);
     }
 
-    function setStudent(string memory name) public {
-        addStudent(students.length, name);
+    function setStudent(uint id, string memory name) public {
+        addStudent(id, name);
     }
 
     function setVolunteering(uint studentID, uint serviceID) public {
+        bool found = false;
+        uint studentListID;
+        for(uint i = 0; i < studentsCount; i++){
+            if(students[i].id == studentID){
+                studentListID = i;
+                found = true;
+                break;
+            }
+        }
+
+        require(found, "Student is not found");
         require(
-            studentID < studentsCount && serviceID < servicesCount,
+            studentListID < studentsCount && serviceID < servicesCount,
             "Invalid ID of student or service"
         );
-        addVolunteering(studentID, serviceID);
+        addVolunteering(studentListID, serviceID);
     }
 
     // Getters
@@ -153,10 +164,12 @@ contract Volunteer {
     function getStudent(uint id) public view
         returns(
         uint,
+        uint,
         string memory
         ) {
         return(
             id,
+            students[id].id,
             students[id].name
         );
     }
@@ -178,12 +191,12 @@ contract Volunteer {
     // Constructor
     constructor () public {
         setService("Service1", 20, 10, 4);
-        setStudent("Student1");
+        setStudent(16012786, "Student1");
 
         setService("Service2", 10, 5, 4);
-        setStudent("Student2");
+        setStudent(16013086, "Student2");
 
         setService("Service3", 15, 7, 4);
-        setStudent("Student3");
+        setStudent(16014086, "Student3");
     }
 }
