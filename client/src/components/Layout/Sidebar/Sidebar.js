@@ -2,6 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { Icon, Layout, Menu } from 'antd';
 import { withRouter, NavLink } from 'react-router-dom';
+import { compose, withHandlers } from 'recompose';
+import { graphql } from 'react-apollo';
+import { CLIENT_LOG_OUT } from '../../../apollo/auth/mutations';
 
 const allSidebarLinks = [
   {
@@ -50,7 +53,8 @@ const providerAllowedLinks = allSidebarLinks.filter(link =>
 const Sidebar = props => {
   const {
     location: { pathname },
-    user
+    user,
+    onLogout
   } = props;
 
 
@@ -80,7 +84,7 @@ const Sidebar = props => {
           </StyledMenuItem>
         ))}
         <StyledMenuItem key="logout">
-          <div>
+          <div onClick={onLogout}>
             <Icon type="logout" />
             Log Out
           </div>
@@ -90,7 +94,15 @@ const Sidebar = props => {
   );
 };
 
-export default  withRouter(Sidebar);
+export default  compose(
+  withRouter,
+  graphql(CLIENT_LOG_OUT, { name: 'clientLogOut' }),
+  withHandlers({
+    onLogout: props => async () => {
+      await props.clientLogOut();
+    },
+  })
+)(Sidebar);
 
 const StyledMenuItem = styled(Menu.Item)`
   height: 50px !important;
