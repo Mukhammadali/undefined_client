@@ -37,13 +37,7 @@ class App extends Component {
   };
 
   render() {
-<<<<<<< Updated upstream
     if (!this.state.contract) return <Spin size="large" />
-=======
-    // if (!this.state.web3) {
-    //   return <div>Loading Web3, accounts, and contract...</div>;
-    // }
->>>>>>> Stashed changes
     return (
       <AppContext.Provider value={this.state}>
         <Router />;
