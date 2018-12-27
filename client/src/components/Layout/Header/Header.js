@@ -19,11 +19,12 @@ function Header({ user }) {
           }}
         />
         <Avatar
-          style={{ color: '#f56a00', backgroundColor: '#fde3cf', marginRight: 30 }}
+          style={{ color: '#f56a00', backgroundColor: '#fde3cf', marginRight: 10 }}
           size="large"
         >
           {user.userName[0].toUpperCase()}
         </Avatar>
+        <span style={{ marginRight: 30  }}>{user.userName}</span>
       </Row>
     </AntdHeader>
   );
