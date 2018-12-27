@@ -14,8 +14,8 @@ const ManageServices = ({ user, title }) => {
           return (
             <div>
               <h1>{title}</h1>
-              {user.role === 'student' && <ServicesTableForStudent web3={web3} /> }
-              {user.role === 'provider' && <ServicesTableForProvider web3={web3} /> }
+              {user.role === 'student' && <ServicesTableForStudent web3={web3} user={user} /> }
+              {user.role === 'provider' && <ServicesTableForProvider web3={web3} user={user} /> }
             </div>
           )
         }
