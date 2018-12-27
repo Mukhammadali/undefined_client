@@ -87,7 +87,7 @@ contract Volunteer {
         }));
     }
 
-    function completeVolunteering(uint volunteeringID) public {
+    function completeVolunteering(uint 2) public {
         volunteerings[volunteeringID].completed = true;
         emit ApproveVolunteeringCompletion(volunteeringID);
     }
