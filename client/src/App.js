@@ -16,14 +16,7 @@ class App extends Component {
     try {
       
       const web3 = await getWeb3();
-<<<<<<< Updated upstream
       const accounts = await web3.eth.getAccounts();
-=======
-
-     
-      const accounts = await web3.eth.getAccounts();
-
->>>>>>> Stashed changes
       
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = Volunteer.networks[networkId];
