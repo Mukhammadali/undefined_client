@@ -16,6 +16,7 @@ contract Volunteer {
         string name;
         bool completed;
         uint credits;
+        uint providerID;
     }
 
     struct Student {
@@ -48,7 +49,7 @@ contract Volunteer {
 
 
 
-    function addService (uint _id, uint _max, uint _current, string memory _name, uint credits) private {
+    function addService (uint _id, uint _max, uint _current, string memory _name, uint credits, uint providerID) private {
         servicesCount ++;
         services.push(Service({
             id: _id,
@@ -56,7 +57,8 @@ contract Volunteer {
             currentNum: _current,
             name: _name,
             completed: false,
-            credits: credits
+            credits: credits,
+            providerID: providerID
         }));
     }
 
@@ -96,7 +98,7 @@ contract Volunteer {
 
     // Creates new service and binds it to existing Service Provider
     function addServiceToServiceProvider(uint sp_id, string memory s_name, uint s_max, uint s_current, uint s_credits) public {
-        setService(s_name, s_max, s_current, s_credits);
+        setService(s_name, s_max, s_current, s_credits, sp_id);
         serviceProviders[sp_id].services[serviceProviders[sp_id].numberOfServices] = services[servicesCount-1];
         serviceProviders[sp_id].numberOfServices++;
     }
@@ -127,8 +129,8 @@ contract Volunteer {
 
     // Setters
 
-    function setService(string memory name, uint max, uint current, uint credits) public {
-        addService(services.length, max, current, name, credits);
+    function setService(string memory name, uint max, uint current, uint credits, uint providerID) public {
+        addService(services.length, max, current, name, credits, providerID);
     }
 
     function setStudent(uint id, string memory name) public {
@@ -170,6 +172,7 @@ contract Volunteer {
         uint,
         string memory,
         bool,
+        uint,
         uint
         ) {
         return(
@@ -178,7 +181,8 @@ contract Volunteer {
             services[id].currentNum,
             services[id].name,
             services[id].completed,
-            services[id].credits
+            services[id].credits,
+            services[id].providerID
         );
     }
 
@@ -253,17 +257,28 @@ contract Volunteer {
 
     // Constructor
     constructor () public {
-        setService("Service1", 20, 10, 4);
+        setServiceProvider("Provider1");
+        setServiceProvider("Provider2");
+        setServiceProvider("Provider3");
+
+        setService("Service1", 20, 10, 4, 0);
+        setService("Service2", 10, 5, 4, 1);
+        setService("Service3", 15, 7, 4, 2);
+
         setStudent(16012786, "Student1");
-
-        setService("Service2", 10, 5, 4);
         setStudent(16013086, "Student2");
-
-        setService("Service3", 15, 7, 4);
         setStudent(16014086, "Student3");
 
-        setServiceProvider("Provider1");
         addServiceToServiceProvider(serviceProvidersIds["Provider1"], "ServiceOfProvider1", 10, 0, 4);
         addServiceToServiceProvider(serviceProvidersIds["Provider1"], "ServiceOfProvider1_2", 10, 0, 4);
+
+        addServiceToServiceProvider(serviceProvidersIds["Provider2"], "ServiceOfProvider2", 8, 0, 9);
+        addServiceToServiceProvider(serviceProvidersIds["Provider2"], "ServiceOfProvider2_2", 8, 0, 9);
+
+        addServiceToServiceProvider(serviceProvidersIds["Provider3"], "ServiceOfProvider3", 3, 0, 1);
+        addServiceToServiceProvider(serviceProvidersIds["Provider3"], "ServiceOfProvider3_2", 3, 0, 1);
+        
+
     }
 }
+
