@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Table, Button, Row, Spin, message } from 'antd';
 import DetailsModal from './DetailsModal';
+import { all } from 'async';
 
 
 export default class ServicesTableForStudent extends Component {
@@ -10,7 +11,7 @@ export default class ServicesTableForStudent extends Component {
     modalVisible: false,
     chosenServiceIndex: null,
     contract: null,
-    data: [],
+    services: [],
     columns: [
       { title: 'Service Name', dataIndex: 'serviceName', key: 'serviceName', width: '50%' },
       { title: 'Credit Amount', dataIndex: 'creditAmount', key: 'creditAmount' },
@@ -39,7 +40,10 @@ export default class ServicesTableForStudent extends Component {
     const { web3: { contract, accounts }, user } = this.props;
     try {
       await contract.methods.setVolunteering(user.userId, serviceId).send({ from: accounts[0] });
-      await  message.success('Successfully Enrolled!')
+      message.success('Successfully Enrolled!')
+      const tempData = this.state.services.filter(o => o.id !== serviceId);
+      this.setState({ services: tempData });
+      await this.filterAndStoreUserServices();
     }
     catch (err) {
       console.error(err);
@@ -47,50 +51,78 @@ export default class ServicesTableForStudent extends Component {
     }
   }
   async componentDidMount (){
-    this.setState({ loading: true });
-    const { accounts, contract } = this.props.web3;
-    console.log('nextProps', this.props);
-    // console.log('contract', contract);
+    this.setState({ loading: true }); 
+    await this.filterAndStoreUserServices();
     
-    // const result = await contract.methods.setService('very good service', 20, 10).send({ from: accounts[0] });
-    // console.log('result', result);
-    const servicesLength = await contract.methods.servicesCount().call();
-    console.log('servicesLength', servicesLength);
+  }
 
-    const newData = [];
+  filterAndStoreUserServices = async () => {
+    const allServices = await this.fetchAllServices();
+    const allVolunteerings = await this.fetchAllVolunteerings();
+
+    const filteredData = allServices.filter(service => {
+      const userExists = allVolunteerings.find(o => o.serviceId === service.id);
+      return !userExists;
+    })
+    this.setState({ services:  filteredData})
+  }
+
+  fetchAllVolunteerings = async () => {
+    const { web3: { contract }, user } = this.props;
+    const allVolunteerings = [];
+    const volunteeringsCount = await contract.methods.volunteeringsCount().call();
+    for (let index = 0; index < volunteeringsCount; index++) {
+      const volunteering = await contract.methods.getVolunteering(index).call()
+      const payload = {
+        userId: volunteering[0],
+        serviceId: volunteering[1],
+        completed: volunteering[2]
+      }
+      if (volunteering[0] === user.userId) {
+        allVolunteerings.push(payload);
+      }
+      
+    }
+    return allVolunteerings;
+  }
+
+  fetchAllServices = async () => {
+    const { web3: { contract } } = this.props;
+    const servicesLength = await contract.methods.servicesCount().call()
+
+    const allServices = [];
     await this.setState({ loading: false })
     for (let index = 0; index < servicesLength; index++) {
       const response = await contract.methods.getService(index).call();
-      console.log('response', response);
       const payload = {
         id: response[0],
         max: response[1],
         usersCount: response[2],
         serviceName: response[3],
-        completed: response[4]
+        completed: response[4],
+        creditAmount: response[5]
       }
-      await newData.push(payload);
+      await allServices.push(payload);
     }
-    console.log('newData', newData);
-    this.setState({ data: newData })
+    return allServices;
   }
   
   toggleModal = (bool, index) => this.setState({ modalVisible: bool, chosenServiceIndex: index });
 
   render() {
-    const { modalVisible, columns, chosenServiceIndex, data, loading } = this.state;
+    const { modalVisible, columns, chosenServiceIndex, services, loading } = this.state;
     return (
       <div>
         <Table
           columns={columns}
-          dataSource={data}
+          dataSource={services}
           pagination={false}
           loading={loading}
           rowKey="id"
         />
         <DetailsModal
           modalVisible={modalVisible}
-          service={data[chosenServiceIndex]}
+          service={services[chosenServiceIndex]}
           chosenServiceIndex={chosenServiceIndex}
           toggleModal={this.toggleModal}
         />

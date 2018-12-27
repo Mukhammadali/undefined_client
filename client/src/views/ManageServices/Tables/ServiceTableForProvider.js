@@ -25,7 +25,7 @@ export default class ServicesTableForProvider extends Component {
             return (
               <Row  type="flex" align="middle">
                 <Button type="primary" style={{ marginRight: 10 }} onClick={() => this.toggleModal(true, index)}>Edit</Button>
-                <Button type="danger" style={{ marginRight: 10 }}>Delete</Button>
+                <Button type="info" style={{ marginRight: 10 }}>Complete</Button>
               </Row>
             )
           }
@@ -48,24 +48,47 @@ export default class ServicesTableForProvider extends Component {
     }
   }
   async componentDidMount (){
-    this.setState({ loading: true });
-    const { accounts, contract } = this.props.web3;
-    const servicesLength = await contract.methods.servicesCount().call();
-    const volunteeringsLength = await contract.methods.volunteeringsCount().call();
-    await this.setState({ loading: false })
-    // console.log('volunteeringsLength', volunteeringsLength);
-    // console.log('servicesLength', servicesLength);
-    const newVolunteerings = [];
-    for (let index = 0; index < volunteeringsLength; index++) {
-      const response = await contract.methods.getVolunteering(index).call();
+    this.setState({ loading: true }); 
+    await this.filterAndStoreUserServices();
+    
+  }
+
+  filterAndStoreUserServices = async () => {
+    const allServices = await this.fetchAllServices();
+    const allVolunteerings = await this.fetchAllVolunteerings();
+
+    const filteredData = allServices.filter(service => {
+      const userExists = allVolunteerings.find(o => o.serviceId === service.id);
+      return !userExists;
+    })
+    this.setState({ services:  filteredData})
+  }
+
+  fetchAllVolunteerings = async () => {
+    const { web3: { contract }, user } = this.props;
+    const allVolunteerings = [];
+    const volunteeringsCount = await contract.methods.volunteeringsCount().call();
+    for (let index = 0; index < volunteeringsCount; index++) {
+      const volunteering = await contract.methods.getVolunteering(index).call()
       const payload = {
-        userId: response[0],
-        serviceId: response[1],
-        completed: response[2]
+        userId: volunteering[0],
+        serviceId: volunteering[1],
+        completed: volunteering[2]
       }
-      await newVolunteerings.push(payload);
+      if (volunteering[0] === user.userId) {
+        allVolunteerings.push(payload);
+      }
+      
     }
-    const newServices = [];
+    return allVolunteerings;
+  }
+
+  fetchAllServices = async () => {
+    const { web3: { contract } } = this.props;
+    const servicesLength = await contract.methods.servicesCount().call()
+
+    const allServices = [];
+    await this.setState({ loading: false })
     for (let index = 0; index < servicesLength; index++) {
       const response = await contract.methods.getService(index).call();
       const payload = {
@@ -73,11 +96,12 @@ export default class ServicesTableForProvider extends Component {
         max: response[1],
         usersCount: response[2],
         serviceName: response[3],
-        completed: response[4]
+        completed: response[4],
+        creditAmount: response[5]
       }
-      await newServices.push(payload);
+      await allServices.push(payload);
     }
-    this.setState({ services: newServices })
+    return allServices;
   }
   
   toggleModal = (bool, index) => this.setState({ modalVisible: bool, chosenServiceIndex: index });

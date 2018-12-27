@@ -32,7 +32,10 @@ export default compose(
     async componentDidMount(){
       const { web3: { contract, accounts }, user } = this.props;
       try {
-        await contract.methods.setStudent(user.userId, user.userName).send({ from: accounts[0] });
+        const doesUserExist = await contract.methods.studentExists(user.userId).call();
+        if (!doesUserExist) {
+          await contract.methods.setStudent(user.userId, user.userName).send({ from: accounts[0] });
+        }
       } catch (err) {
         console.error(err)
       }

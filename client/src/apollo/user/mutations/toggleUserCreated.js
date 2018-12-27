@@ -1,8 +1,8 @@
 import { gql } from 'apollo-boost';
 
-export const ME_QUERY = gql`
-  query me {
-    me {
+export const TOGGLE_USER_CREATED_MUTATION = gql`
+  mutation toggleUserCreated{
+    toggleUserCreated {
       id
       userId
       userName
@@ -11,4 +11,5 @@ export const ME_QUERY = gql`
       isUserCreated
     }
   }
+
 `;
