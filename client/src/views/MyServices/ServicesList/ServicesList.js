@@ -19,6 +19,11 @@ const columns = [
       <span>{record.usersCount} / <b>{record.max}</b></span>
     )
   } },
+  { title: 'Author', dataIndex: 'providerName', key: 'providerName', render: (text, record, index) => {
+    return (
+      <span>{record.providerName}</span>
+    )
+  } },
   { title: 'Status', dataIndex: 'completed', key: 'completed', render: (text, { completed }) => {
     console.log('completed', completed);
     if(completed) return <Tag color="green">Completed</Tag>
@@ -79,14 +84,16 @@ export default class ServicesList extends Component {
     await this.setState({ loading: false })
     for (let index = 0; index < servicesLength; index++) {
       const response = await contract.methods.getService(index).call();
-      console.log('response', response);
+      const providerAuthor = await contract.methods.serviceProviders(response[6]).call()
       const payload = {
         id: response[0],
         max: response[1],
         usersCount: response[2],
         serviceName: response[3],
         completed: response[4],
-        creditAmount: response[5]
+        creditAmount: response[5],
+        userId: response[6],
+        providerName: providerAuthor.name
       }
       await allServices.push(payload);
     }

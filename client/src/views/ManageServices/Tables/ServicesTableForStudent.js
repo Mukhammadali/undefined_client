@@ -20,6 +20,11 @@ export default class ServicesTableForStudent extends Component {
           <span>{record.usersCount} / <b>{record.max}</b></span>
         )
       } },
+      { title: 'Author', dataIndex: 'providerName', key: 'providerName', render: (text, record, index) => {
+        return (
+          <span>{record.providerName}</span>
+        )
+      } },
       {
         title: 'Enroll', dataIndex: '', key: 'x', render: (text, record, index) => {
           if (record.usersCount !== record.max){
@@ -94,13 +99,16 @@ export default class ServicesTableForStudent extends Component {
     await this.setState({ loading: false })
     for (let index = 0; index < servicesLength; index++) {
       const response = await contract.methods.getService(index).call();
+      const providerAuthor = await contract.methods.serviceProviders(response[6]).call()
       const payload = {
         id: response[0],
         max: response[1],
         usersCount: response[2],
         serviceName: response[3],
         completed: response[4],
-        creditAmount: response[5]
+        creditAmount: response[5],
+        userId: response[6],
+        providerName: providerAuthor.name
       }
       await allServices.push(payload);
     }

@@ -33,7 +33,7 @@ export default compose(
       const { web3: { contract, accounts }, user } = this.props;
       try {
         const doesUserExist = await contract.methods.studentExists(user.userId).call();
-        if (!doesUserExist) {
+        if (!doesUserExist && user.role === 'student') {
           await contract.methods.setStudent(user.userId, user.userName).send({ from: accounts[0] });
         }
       } catch (err) {

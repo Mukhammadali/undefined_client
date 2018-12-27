@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Route, Switch, Redirect } from 'react-router-dom';
+import { compose, lifecycle } from 'recompose'
 import { Error404 } from '../../../components';
 import ManageServices from '../../../views/ManageServices';
 
@@ -25,4 +26,20 @@ const ProviderRoutes = props => {
   );
 };
 
-export default ProviderRoutes;
+export default compose(
+  lifecycle({
+    async componentDidMount(){
+      const { web3: { contract, accounts }, user } = this.props;
+      console.log('user', user);
+      try {
+        const doesUserExist = await contract.methods.serviceProviders(user.userId).call();
+        console.log('doesUserExist', doesUserExist);
+        if (doesUserExist.id === '0' && user.role === 'provider') {
+          await contract.methods.setServiceProvider(user.userId, user.userName).send({ from: accounts[0] });
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+  })
+)(ProviderRoutes);

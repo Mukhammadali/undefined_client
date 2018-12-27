@@ -34,16 +34,25 @@ export default class ServicesTableForProvider extends Component {
     ],
   }
   createService = async values => {
-    // const { web3: { contract, accounts }, user } = this.props;
-    // try {
-    //   await contract.methods.setVolunteering(user.userId, serviceId).send({ from: accounts[0] });
-    //   await  message.success('Successfully Updated!')
-    //   await this.toggleModal(false, this.state.chosenServiceIndex);
-    // }
-    // catch (err) {
-    //   console.error(err);
-    //   message.error('Something went wrong! Please try again!')
-    // }
+    const { web3: { contract, accounts }, user } = this.props;
+    try {
+      await contract.methods.addServiceToServiceProvider(
+        user.userId,
+        values.serviceName,
+        values.max,
+        values.usersCount,
+        values.creditsAmount
+      ).send({ from: accounts[0] });
+      await  message.success('Successfully Created!')
+      await this.toggleModal(false);
+      const tempData = [this.state.services, values];
+      this.setState({ services: tempData });
+      this.filterAndStoreUserServices();
+    }
+    catch (err) {
+      console.error(err);
+      message.error('Something went wrong! Please try again!')
+    }
   }
   async componentDidMount (){
     this.setState({ loading: true }); 
@@ -53,36 +62,12 @@ export default class ServicesTableForProvider extends Component {
 
   filterAndStoreUserServices = async () => {
     const allServices = await this.fetchAllServices();
-    const allVolunteerings = await this.fetchAllVolunteerings();
-
-    const filteredData = allServices.filter(service => {
-      const userExists = allVolunteerings.find(o => o.serviceId === service.id);
-      return !userExists;
-    })
-    this.setState({ services:  filteredData})
-  }
-
-  fetchAllVolunteerings = async () => {
-    const { web3: { contract }, user } = this.props;
-    const allVolunteerings = [];
-    const volunteeringsCount = await contract.methods.volunteeringsCount().call();
-    for (let index = 0; index < volunteeringsCount; index++) {
-      const volunteering = await contract.methods.getVolunteering(index).call()
-      const payload = {
-        userId: volunteering[0],
-        serviceId: volunteering[1],
-        completed: volunteering[2]
-      }
-      if (volunteering[0] === user.userId) {
-        allVolunteerings.push(payload);
-      }
-      
-    }
-    return allVolunteerings;
+    
+    this.setState({ services:  allServices})
   }
 
   fetchAllServices = async () => {
-    const { web3: { contract } } = this.props;
+    const { web3: { contract }, user } = this.props;
     const servicesLength = await contract.methods.servicesCount().call()
 
     const allServices = [];
@@ -96,9 +81,12 @@ export default class ServicesTableForProvider extends Component {
         usersCount: response[2],
         serviceName: response[3],
         completed: response[4],
-        creditAmount: response[5]
+        creditAmount: response[5],
+        userId: response[6]
       }
-      await allServices.push(payload);
+      if (user.userId === response[6]) {
+        await allServices.push(payload);
+      }
     }
     return allServices;
   }

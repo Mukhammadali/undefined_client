@@ -32,7 +32,17 @@ const CreateServiceModal = props => {
               rules: [{ required: true, message: 'Max Number is required' }],
               initialValue: ''
             })(
-              <StyledInput placeholder="Enter maximum number" />
+              <Input placeholder="Enter maximum number" />
+            )
+          }
+        </Form.Item>
+        <Form.Item label="Number of Credits:" required>
+          {
+            getFieldDecorator('creditsAmount',{
+              rules: [{ required: true, message: 'Number of Credits is required' }],
+              initialValue: ''
+            })(
+              <Input placeholder="Enter number of credits" />
             )
           }
         </Form.Item>
@@ -65,7 +75,7 @@ export default compose(
       const { form, createService } = props;
       await form.validateFields((formErr, values) => {
         if(!formErr) {
-          console.log({ values });
+          createService({...values, usersCount: 0 });
         }
       })
     }
