@@ -5,7 +5,8 @@ contract Volunteer {
     struct ServiceProvider{
         uint id;
         string name;
-        Service[] services;
+        mapping(uint => Service) services;
+        uint numberOfServices;
     }
 
     struct Service {
@@ -39,6 +40,11 @@ contract Volunteer {
 
     ServiceProvider[] public serviceProviders;
     uint public serviceProvidersCount;
+
+    // For keeping track of id's of Service Providers in sercieProviders array
+    // LATER: Find better solution
+    mapping(string => uint) serviceProvidersIds;
+
 
 
 
@@ -79,15 +85,27 @@ contract Volunteer {
     }
 
     function addServiceProvider(uint id, string memory name) private {
+        serviceProvidersIds[name] = id;
         serviceProvidersCount++;
         serviceProviders.push(ServiceProvider({
             id: id,
             name: name,
-            services: new Service[](100)
+            numberOfServices: 0
         }));
     }
 
+<<<<<<< HEAD
+    // Creates new service and binds it to existing Service Provider
+    function addServiceToServiceProvider(uint sp_id, string memory s_name, uint s_max, uint s_current, uint s_credits) public {
+        setService(s_name, s_max, s_current, s_credits);
+        serviceProviders[sp_id].services[serviceProviders[sp_id].numberOfServices] = services[servicesCount-1];
+        serviceProviders[sp_id].numberOfServices++;
+    }
+
+    function completeVolunteering(uint volunteeringID) public {
+=======
     function completeVolunteering(uint 2) public {
+>>>>>>> 8a66983deecd294fc7b1fe003726f537d670b7e3
         volunteerings[volunteeringID].completed = true;
         emit ApproveVolunteeringCompletion(volunteeringID);
     }
@@ -118,6 +136,7 @@ contract Volunteer {
     }
 
     function setStudent(uint id, string memory name) public {
+        require(!studentExists(id), "Student already exists.");
         addStudent(id, name);
     }
 
@@ -139,6 +158,12 @@ contract Volunteer {
         );
         addVolunteering(studentListID, serviceID);
     }
+
+    // Creates new Service Provider
+    function setServiceProvider(string memory name) public {
+        addServiceProvider(serviceProviders.length, name);
+    }
+
 
     // Getters
 
@@ -183,6 +208,15 @@ contract Volunteer {
         );
     }
 
+    // Returns name of service at index of array services in Service Provider sp_name
+    function getServiceProvidersService(string memory sp_name, uint index) public view returns(string memory) {
+        require(index < serviceProviders[serviceProvidersIds[sp_name]].numberOfServices, "Our of range of services available in this Service Provider");
+        return(
+            serviceProviders[serviceProvidersIds[sp_name]].services[index].name
+        );
+    }
+
+
     function studentExists(uint id) public view returns( bool ){
         bool exists = false;
         for(uint i = 0; i < studentsCount; i++){
@@ -192,6 +226,17 @@ contract Volunteer {
             }
         }
         return (exists);
+    }
+
+    function studentEnrolledInService(uint studentID, uint serviceID) public view returns(bool){
+        bool enrolled = false;
+        for(uint i = 0; i < volunteeringsCount; i++){
+            if(volunteerings[i].studentID == studentID && volunteerings[i].serviceID == serviceID){
+                enrolled = true;
+                break;
+            }
+        }
+        return (enrolled);
     }
 
 
@@ -205,4 +250,8 @@ contract Volunteer {
 
         setService("Service3", 15, 7, 4);
         setStudent(16014086, "Student3");
+
+        setServiceProvider("Provider1");
+        addServiceToServiceProvider(serviceProvidersIds["Provider1"], "ServiceOfProvider1", 10, 0, 4);
+        addServiceToServiceProvider(serviceProvidersIds["Provider1"], "ServiceOfProvider1_2", 10, 0, 4);
     }
