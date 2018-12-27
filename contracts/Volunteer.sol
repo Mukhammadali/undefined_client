@@ -161,12 +161,8 @@ contract Volunteer {
         );
     }
 
-    function getStudent(uint id) public view
-        returns(
-        uint,
-        uint,
-        string memory
-        ) {
+    function getStudent(uint id) public view returns(uint, uint, string memory) {
+        require(studentExists(id), "Student does not exist.");
         return(
             id,
             students[id].id,
@@ -185,6 +181,17 @@ contract Volunteer {
             volunteerings[id].serviceID,
             volunteerings[id].completed
         );
+    }
+
+    function studentExists(uint id) public view returns( bool ){
+        bool exists = false;
+        for(uint i = 0; i < studentsCount; i++){
+            if(students[i].id == id){
+                exists = true;
+                break;
+            }
+        }
+        return (exists);
     }
 
 
