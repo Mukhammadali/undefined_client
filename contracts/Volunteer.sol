@@ -2,12 +2,19 @@ pragma solidity >=0.4.22 <0.6.0;
 
 contract Volunteer {
 
+    struct ServiceProvider{
+        uint id;
+        string name;
+        Service[] services;
+    }
+
     struct Service {
         uint id;
-        uint maxNum; // Max students who can enroll
-        uint currentNum; // Current enrolled students
+        uint maxNum;
+        uint currentNum; 
         string name;
         bool completed;
+        uint credits;
     }
 
     struct Student {
@@ -30,15 +37,20 @@ contract Volunteer {
     Volunteering[] public volunteerings;
     uint public volunteeringsCount;
 
+    ServiceProvider[] public serviceProviders;
+    uint public serviceProvidersCount;
 
-    function addService (uint _id, uint _max, uint _current, string memory _name) private {
+
+
+    function addService (uint _id, uint _max, uint _current, string memory _name, uint credits) private {
         servicesCount ++;
         services.push(Service({
             id: _id,
             maxNum: _max,
             currentNum: _current,
             name: _name,
-            completed: false
+            completed: false,
+            credits: credits
         }));
     }
 
@@ -53,12 +65,26 @@ contract Volunteer {
 
     function addVolunteering (uint studentID, uint serviceID) private {
         volunteeringsCount ++;
+        
+        require(!services[serviceID].completed, "Service is expired");
+        require(services[serviceID].currentNum < services[serviceID].maxNum, "Volunteers exceeded");
+        services[serviceID].currentNum++;
+
         volunteerings.push(Volunteering({
-            studentID: studentID,
+            studentID: students[studentID].id,
             serviceID: serviceID,
             completed: false
         }));
         emit EstablishVolunteering(studentID, serviceID);
+    }
+
+    function addServiceProvider(uint id, string memory name) private {
+        serviceProvidersCount++;
+        serviceProviders.push(ServiceProvider({
+            id: id,
+            name: name,
+            services: new Service[](100)
+        }));
     }
 
     function completeVolunteering(uint volunteeringID) public {
@@ -87,48 +113,63 @@ contract Volunteer {
 
     // Setters
 
-    function setService(string memory name, uint max, uint current) public {
-        addService(services.length, max, current, name);
+    function setService(string memory name, uint max, uint current, uint credits) public {
+        addService(services.length, max, current, name, credits);
     }
 
-    function setStudent(string memory name) public {
-        addStudent(students.length, name);
+    function setStudent(uint id, string memory name) public {
+        addStudent(id, name);
     }
 
     function setVolunteering(uint studentID, uint serviceID) public {
+        bool found = false;
+        uint studentListID;
+        for(uint i = 0; i < studentsCount; i++){
+            if(students[i].id == studentID){
+                studentListID = i;
+                found = true;
+                break;
+            }
+        }
+
+        require(found, "Student is not found");
         require(
-            studentID < studentsCount && serviceID < servicesCount,
+            studentListID < studentsCount && serviceID < servicesCount,
             "Invalid ID of student or service"
         );
-        addVolunteering(studentID, serviceID);
+        addVolunteering(studentListID, serviceID);
     }
 
     // Getters
 
     function getService(uint id) public view
         returns(
-        uint,
+        uint, 
         uint, 
         uint,
         string memory,
-        bool
+        bool,
+        uint
         ) {
         return(
             id,
             services[id].maxNum,
             services[id].currentNum,
             services[id].name,
-            services[id].completed
+            services[id].completed,
+            services[id].credits
         );
     }
 
     function getStudent(uint id) public view
         returns(
         uint,
+        uint,
         string memory
         ) {
         return(
             id,
+            students[id].id,
             students[id].name
         );
     }
@@ -149,13 +190,13 @@ contract Volunteer {
 
     // Constructor
     constructor () public {
-        setService("Service1", 20, 10);
-        setStudent("Student1");
+        setService("Service1", 20, 10, 4);
+        setStudent(16012786, "Student1");
 
-        setService("Service2", 10, 5);
-        setStudent("Student2");
+        setService("Service2", 10, 5, 4);
+        setStudent(16013086, "Student2");
 
-        setService("Service3", 15, 7);
-        setStudent("Student3");
+        setService("Service3", 15, 7, 4);
+        setStudent(16014086, "Student3");
     }
 }
