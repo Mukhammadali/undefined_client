@@ -17,6 +17,7 @@ contract Volunteer {
         bool completed;
         uint credits;
         uint providerID;
+        string description;
     }
 
     struct Student {
@@ -49,13 +50,14 @@ contract Volunteer {
 
 
 
-    function addService (uint _id, uint _max, uint _current, string memory _name, uint credits, uint providerID) private {
+    function addService (uint _id, uint _max, uint _current, string memory _name, string memory description, uint credits, uint providerID) private {
         servicesCount ++;
         services.push(Service({
             id: _id,
             maxNum: _max,
             currentNum: _current,
             name: _name,
+            description: description,
             completed: false,
             credits: credits,
             providerID: providerID
@@ -97,8 +99,8 @@ contract Volunteer {
     }
 
     // Creates new service and binds it to existing Service Provider
-    function addServiceToServiceProvider(uint sp_id, string memory s_name, uint s_max, uint s_current, uint s_credits) public {
-        setService(s_name, s_max, s_current, s_credits, sp_id);
+    function addServiceToServiceProvider(uint sp_id, string memory s_name, string memory s_description, uint s_max, uint s_current, uint s_credits) public {
+        setService(s_name, s_description, s_max, s_current, s_credits, sp_id);
         serviceProviders[sp_id].services[serviceProviders[sp_id].numberOfServices] = services[servicesCount-1];
         serviceProviders[sp_id].numberOfServices++;
     }
@@ -129,8 +131,8 @@ contract Volunteer {
 
     // Setters
 
-    function setService(string memory name, uint max, uint current, uint credits, uint providerID) public {
-        addService(services.length, max, current, name, credits, providerID);
+    function setService(string memory name, string memory description, uint max, uint current, uint credits, uint providerID) public {
+        addService(services.length, max, current, name, description, credits, providerID);
     }
 
     function setStudent(uint id, string memory name) public {
@@ -168,18 +170,18 @@ contract Volunteer {
     function getService(uint id) public view
         returns(
         uint, 
-        uint, 
         uint,
+        string memory,
         string memory,
         bool,
         uint,
         uint
         ) {
         return(
-            id,
             services[id].maxNum,
             services[id].currentNum,
             services[id].name,
+            services[id].description,
             services[id].completed,
             services[id].credits,
             services[id].providerID
@@ -222,8 +224,9 @@ contract Volunteer {
         );
     }
 
-    function editService(uint id, string memory new_name, uint new_max, uint new_current, bool new_completed, uint new_credits) public {
+    function editService(uint id, string memory new_name, string memory new_description, uint new_max, uint new_current, bool new_completed, uint new_credits) public {
         services[id].name = new_name;
+        services[id].description = new_description;
         services[id].maxNum = new_max;
         services[id].currentNum = new_current;
         services[id].completed = new_completed;
@@ -261,22 +264,22 @@ contract Volunteer {
         setServiceProvider(1501011, "Provider2");
         setServiceProvider(1501012, "Provider3");
 
-        setService("Service1", 20, 10, 4, 1501010);
-        setService("Service2", 10, 5, 4, 1501011);
-        setService("Service3", 15, 7, 4, 1501011);
+        setService("Service1", "Description to Service1", 20, 10, 4, 1501010);
+        setService("Service2", "Description to Service2", 10, 5, 4, 1501011);
+        setService("Service3", "Description to Service3", 15, 7, 4, 1501011);
 
         setStudent(16012786, "Student1");
         setStudent(16013086, "Student2");
         setStudent(16014086, "Student3");
 
-        addServiceToServiceProvider(1501010, "ServiceOfProvider1", 10, 0, 4);
-        addServiceToServiceProvider(1501010, "ServiceOfProvider1_2", 10, 0, 4);
+        addServiceToServiceProvider(1501010, "ServiceOfProvider1", "Description to ServiceOfProvider1",  10, 0, 4);
+        addServiceToServiceProvider(1501010, "ServiceOfProvider1_2", "Description to ServiceOfProvider1_2", 10, 0, 4);
 
-        addServiceToServiceProvider(1501011, "ServiceOfProvider2", 8, 0, 9);
-        addServiceToServiceProvider(1501011, "ServiceOfProvider2_2", 8, 0, 9);
+        addServiceToServiceProvider(1501011, "ServiceOfProvider2", "Description to ServiceOfProvider2", 8, 0, 9);
+        addServiceToServiceProvider(1501011, "ServiceOfProvider2_2", "Description to ServiceOfProvider2_2", 8, 0, 9);
 
-        addServiceToServiceProvider(1501012, "ServiceOfProvider3", 3, 0, 1);
-        addServiceToServiceProvider(1501012, "ServiceOfProvider3_2", 3, 0, 1);
+        addServiceToServiceProvider(1501012, "ServiceOfProvider3", "Description to ServiceOfProvider3", 3, 0, 1);
+        addServiceToServiceProvider(1501012, "ServiceOfProvider3_2", "Description to ServiceOfProvider3_2", 3, 0, 1);
     
     }
 }
