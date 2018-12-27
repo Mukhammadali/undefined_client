@@ -7,17 +7,22 @@ import { withApollo, graphql } from 'react-apollo';
 import { Layout, handleQueryLoadingError } from '../../components';
 import { ME_QUERY } from '../../apollo/user/queries';
 import { StudentRoutes, ProviderRoutes } from './RouteGroup';
+import AppContext from '../../AppContext';
 
 const ProtectedRoutes = ({ data }) => {
   const { role } = data.me;
   console.log('data', data);
   return (
-    <Layout user={data.me}>
-      <Switch>
-        {role === 'student' && <StudentRoutes user={data.me}/>}
-        {role === 'provider' && <ProviderRoutes user={data.me}/>}
-      </Switch>
-    </Layout>
+    <AppContext.Consumer>
+      {web3 => (
+        <Layout user={data.me}>
+          <Switch>
+            {role === 'student' && <StudentRoutes user={data.me} web3={web3} />}
+            {role === 'provider' && <ProviderRoutes user={data.me} web3={web3} />}
+          </Switch>
+        </Layout>
+      )}
+    </AppContext.Consumer>
   );
 };
 

@@ -94,6 +94,7 @@ contract Volunteer {
         }));
     }
 
+<<<<<<< HEAD
     // Creates new service and binds it to existing Service Provider
     function addServiceToServiceProvider(uint sp_id, string memory s_name, uint s_max, uint s_current, uint s_credits) public {
         setService(s_name, s_max, s_current, s_credits);
@@ -102,6 +103,9 @@ contract Volunteer {
     }
 
     function completeVolunteering(uint volunteeringID) public {
+=======
+    function completeVolunteering(uint 2) public {
+>>>>>>> 8a66983deecd294fc7b1fe003726f537d670b7e3
         volunteerings[volunteeringID].completed = true;
         emit ApproveVolunteeringCompletion(volunteeringID);
     }

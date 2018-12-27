@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Table, Button, Row, Spin } from 'antd';
+import { Table, Button, Row, Spin, message } from 'antd';
 import DetailsModal from './DetailsModal';
 
 
@@ -24,7 +24,7 @@ export default class ServicesTableForStudent extends Component {
           if (record.usersCount !== record.max){
             return (
               <Row  type="flex" align="middle">
-                <Button type="primary" style={{ marginRight: 10 }}>Enroll</Button>
+                <Button type="primary" style={{ marginRight: 10 }} onClick={() => this.enrollVolunteering(record.id) } >Enroll</Button>
                 <Button type="primary" ghost onClick={() => this.toggleModal(true, index)}>Details</Button>
               </Row>
             )
@@ -34,9 +34,17 @@ export default class ServicesTableForStudent extends Component {
       },
     ],
   }
-  enrollVolunteering = serviceId => {
-    const { contract } = this.props.web3;
-    contract.methods.addVolunteering()
+  enrollVolunteering = async serviceId => {
+    console.log('serviceId', serviceId);
+    const { web3: { contract, accounts }, user } = this.props;
+    try {
+      await contract.methods.setVolunteering(user.userId, serviceId).send({ from: accounts[0] });
+      await  message.success('Successfully Enrolled!')
+    }
+    catch (err) {
+      console.error(err);
+      message.error('Something went wrong! Please try again!')
+    }
   }
   async componentDidMount (){
     this.setState({ loading: true });
@@ -53,6 +61,7 @@ export default class ServicesTableForStudent extends Component {
     await this.setState({ loading: false })
     for (let index = 0; index < servicesLength; index++) {
       const response = await contract.methods.getService(index).call();
+      console.log('response', response);
       const payload = {
         id: response[0],
         max: response[1],

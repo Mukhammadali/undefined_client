@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
+import { lifecycle, compose } from 'recompose';
 
 import { Error404 } from '../../../components';
 import ManageServices from '../../../views/ManageServices';
@@ -7,7 +8,6 @@ import MyServices from '../../../views/MyServices';
 
 const StudentRoutes = props => {
   const { user } = props;
-  console.log('props', props);
   return (
     <Switch>
       <Route exact path="/main">
@@ -27,4 +27,11 @@ const StudentRoutes = props => {
   );
 };
 
-export default StudentRoutes;
+export default compose(
+  lifecycle({
+    async componentDidMount(){
+      const { web3: { contract, accounts }, user } = this.props;
+      await contract.methods.setStudent(user.userId, user.userName).send({ from: accounts[0] });
+    }
+  })
+)(StudentRoutes);

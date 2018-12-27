@@ -9,13 +9,7 @@ const resolvers = {
     },
     clientLogOut: async (_, data, { cache }) => {
       await resetToken();
-      cache.writeData({ data: { loggedIn: false } });
-      return null;
-    },
-    clientStoreContract: async (_, data, { cache }) => {
-      console.log('storeContract', data);
-      // await resetToken();
-      // cache.writeData({ data: { loggedIn: false } });
+      setTimeout(cache.writeData({ data: { loggedIn: false } }), 3000)
       return null;
     },
   }

@@ -5,8 +5,6 @@ import { Spin } from 'antd'
 
 import "./App.css";
 import Router from "./Router/Router.js";
-import { graphql } from "react-apollo";
-import { CLIENT_STORE_CONTRACT } from "./apollo/global/mutations/clientStoreContract.js";
 import AppContext from "./AppContext.js";
 
 class App extends Component {
@@ -46,4 +44,4 @@ class App extends Component {
   }
 }
 
-export default graphql(CLIENT_STORE_CONTRACT, { name: 'clientStoreContract' })(App);
+export default App;
