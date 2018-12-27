@@ -1,4 +1,5 @@
-import { resetToken, setToken } from '../lib/utils/authUtils';
+import { resetToken, setToken, getToken } from '../lib/utils/authUtils';
+import { unsubscribeApollo } from '../ApolloClient';
 
 const resolvers = {
   Mutation: {
@@ -8,8 +9,14 @@ const resolvers = {
       return null;
     },
     clientLogOut: async (_, data, { cache }) => {
+      // await cache.resetStore();
       await resetToken();
-      setTimeout(cache.writeData({ data: { loggedIn: false } }), 3000)
+      // const token = await getToken();
+      // console.log('token', token);
+      // if (!token) {
+      //   await cache.writeData({ data: { loggedIn: false } });
+      // }
+      await document.location.reload();
       return null;
     },
   }

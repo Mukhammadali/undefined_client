@@ -20,7 +20,6 @@ const ManageServices = ({ user, title }) => {
           )
         }
       }
-    
     </AppContext.Consumer>
   )
 }

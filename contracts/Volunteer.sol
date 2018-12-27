@@ -206,4 +206,3 @@ contract Volunteer {
         setService("Service3", 15, 7, 4);
         setStudent(16014086, "Student3");
     }
-}
