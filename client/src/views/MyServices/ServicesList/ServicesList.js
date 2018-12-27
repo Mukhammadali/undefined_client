@@ -3,33 +3,34 @@ import PropTypes from 'prop-types'
 import { Table } from 'antd';
 import data from './mockData';
 import getWeb3 from "../../../utils/getWeb3";
-import SimpleStorageContract from "../../../contracts/SimpleStorage.json";
+import Volunteer from '../../../contracts/Volunteer.json';
 
 
 export default class ServicesList extends Component {
-  static propTypes = {
-    prop: PropTypes,
-  }
   async componentDidMount(){
     try {
           // Get network provider and web3 instance.
           const web3 = await getWeb3();
+          console.log('web3', web3);
     
           // Use web3 to get the user's accounts.
           // await window.ethereum.enable();
           const accounts = await web3.eth.getAccounts();
+          // console.log('accounts', accounts);
     
           // Get the contract instance.
           const networkId = await web3.eth.net.getId();
-          const deployedNetwork = SimpleStorageContract.networks[networkId];
+          const deployedNetwork = Volunteer.networks[networkId];
           const instance = new web3.eth.Contract(
-            SimpleStorageContract.abi,
+            Volunteer.abi,
             deployedNetwork && deployedNetwork.address,
           );
+
+          // instance.methods.
     
           // Set web3, accounts, and contract to the state, and then proceed with an
           // example of interacting with the contract's methods.
-          this.setState({ web3, accounts, contract: instance }, this.runExample);
+          this.setState({ web3, accounts, contract: instance });
         } catch (error) {
           // Catch any errors for any of the above operations.
           alert(
