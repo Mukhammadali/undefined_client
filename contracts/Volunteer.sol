@@ -223,14 +223,14 @@ contract Volunteer {
         returns(
         uint,
         uint,
-        uint,
-        bool
+        bool,
+        uint
         ) {
         return(
-            id,
             volunteerings[id].studentID,
             volunteerings[id].serviceID,
-            volunteerings[id].completed
+            volunteerings[id].completed,
+            id
         );
     }
 
