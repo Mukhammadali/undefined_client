@@ -37,7 +37,7 @@ const allSidebarLinks = [
   
 ];
 
-const studentHasAccess = ['enroll-voluntary-service', 'my-voluntary-services', 'option-2'];
+const studentHasAccess = ['enroll-voluntary-service', 'my-voluntary-services'];
 const providerAccess = ['manage-services', 'option-1', 'option-2'];
 
 const studentAllowedLinks = allSidebarLinks.filter(link =>

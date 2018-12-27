@@ -18,6 +18,6 @@ export default [
     serviceName: 'Administrative Office Work in Student Union Building',
     usersCount: 23,
     max: 32,
-    creditAmount: 12,
+    creditAmount: 3,
   },
 ]

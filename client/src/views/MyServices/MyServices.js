@@ -1,10 +1,11 @@
 import React from 'react'
-import data from './mockData';
+import ServicesList from './ServicesList';
 
 const MyServices = ({ user, title }) => {
   return (
     <div>
       <h1>{title}</h1>
+      <ServicesList user={user} />
     </div>
   )
 }
