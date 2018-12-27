@@ -212,6 +212,14 @@ contract Volunteer {
         );
     }
 
+    function editService(uint id, string memory new_name, uint new_max, uint new_current, bool new_completed, uint new_credits) public {
+        services[id].name = new_name;
+        services[id].maxNum = new_max;
+        services[id].currentNum = new_current;
+        services[id].completed = new_completed;
+        services[id].credits = new_credits;        
+    }
+
 
 
     function studentExists(uint id) public view returns( bool ){
@@ -252,3 +260,4 @@ contract Volunteer {
         addServiceToServiceProvider(serviceProvidersIds["Provider1"], "ServiceOfProvider1", 10, 0, 4);
         addServiceToServiceProvider(serviceProvidersIds["Provider1"], "ServiceOfProvider1_2", 10, 0, 4);
     }
+}
