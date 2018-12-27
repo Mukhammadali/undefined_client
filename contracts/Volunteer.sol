@@ -26,6 +26,7 @@ contract Volunteer {
     }
 
     struct Volunteering {
+        uint id;
         uint studentID;
         uint serviceID;
         bool completed;
@@ -74,18 +75,18 @@ contract Volunteer {
     }
 
     function addVolunteering (uint studentID, uint serviceID) private {
-        volunteeringsCount ++;
-        
         require(!services[serviceID].completed, "Service is expired");
         require(services[serviceID].currentNum < services[serviceID].maxNum, "Volunteers exceeded");
         services[serviceID].currentNum++;
 
         volunteerings.push(Volunteering({
+            id: volunteeringsCount,
             studentID: students[studentID].id,
             serviceID: serviceID,
             completed: false
         }));
-        emit EstablishVolunteering(studentID, serviceID);
+        emit EstablishVolunteering(volunteeringsCount, studentID, serviceID);
+        volunteeringsCount ++;
     }
 
     function addServiceProvider(uint id, string memory name) private {
@@ -122,6 +123,7 @@ contract Volunteer {
 
 
     event EstablishVolunteering (
+        uint indexed _id,
         uint indexed _studentID,
         uint indexed _serviceID
     );
@@ -221,9 +223,11 @@ contract Volunteer {
         returns(
         uint,
         uint,
+        uint,
         bool
         ) {
         return(
+            id,
             volunteerings[id].studentID,
             volunteerings[id].serviceID,
             volunteerings[id].completed
