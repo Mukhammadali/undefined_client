@@ -39,12 +39,12 @@ contract Volunteer {
     Volunteering[] public volunteerings;
     uint public volunteeringsCount;
 
-    ServiceProvider[] public serviceProviders;
+    // ServiceProvider[] public serviceProviders;
     uint public serviceProvidersCount;
 
     // For keeping track of id's of Service Providers in sercieProviders array
     // LATER: Find better solution
-    mapping(string => uint) serviceProvidersIds;
+    mapping(uint => ServiceProvider) public serviceProviders;
 
 
 
@@ -87,13 +87,13 @@ contract Volunteer {
     }
 
     function addServiceProvider(uint id, string memory name) private {
-        serviceProvidersIds[name] = id;
+        // serviceProvidersIds[name] = id;
         serviceProvidersCount++;
-        serviceProviders.push(ServiceProvider({
+        serviceProviders[id] = ServiceProvider({
             id: id,
             name: name,
             numberOfServices: 0
-        }));
+        });
     }
 
     // Creates new service and binds it to existing Service Provider
@@ -158,8 +158,8 @@ contract Volunteer {
     }
 
     // Creates new Service Provider
-    function setServiceProvider(string memory name) public {
-        addServiceProvider(serviceProviders.length, name);
+    function setServiceProvider(uint id, string memory name) public {
+        addServiceProvider(id, name);
     }
 
 
@@ -215,10 +215,10 @@ contract Volunteer {
     }
 
     // Returns name of service at index of array services in Service Provider sp_name
-    function getServiceProvidersService(string memory sp_name, uint index) public view returns(string memory) {
-        require(index < serviceProviders[serviceProvidersIds[sp_name]].numberOfServices, "Our of range of services available in this Service Provider");
+    function getServiceProvidersService(uint id, uint index) public view returns(string memory) {
+        // require(index < serviceProviders[serviceProvidersIds[sp_name]].numberOfServices, "Our of range of services available in this Service Provider");
         return(
-            serviceProviders[serviceProvidersIds[sp_name]].services[index].name
+            serviceProviders[id].services[index].name
         );
     }
 
@@ -257,28 +257,27 @@ contract Volunteer {
 
     // Constructor
     constructor () public {
-        setServiceProvider("Provider1");
-        setServiceProvider("Provider2");
-        setServiceProvider("Provider3");
+        setServiceProvider(1501010, "Provider1");
+        setServiceProvider(1501011, "Provider2");
+        setServiceProvider(1501012, "Provider3");
 
-        setService("Service1", 20, 10, 4, 0);
-        setService("Service2", 10, 5, 4, 1);
-        setService("Service3", 15, 7, 4, 2);
+        setService("Service1", 20, 10, 4, 1501010);
+        setService("Service2", 10, 5, 4, 1501011);
+        setService("Service3", 15, 7, 4, 1501011);
 
         setStudent(16012786, "Student1");
         setStudent(16013086, "Student2");
         setStudent(16014086, "Student3");
 
-        addServiceToServiceProvider(serviceProvidersIds["Provider1"], "ServiceOfProvider1", 10, 0, 4);
-        addServiceToServiceProvider(serviceProvidersIds["Provider1"], "ServiceOfProvider1_2", 10, 0, 4);
+        addServiceToServiceProvider(1501010, "ServiceOfProvider1", 10, 0, 4);
+        addServiceToServiceProvider(1501010, "ServiceOfProvider1_2", 10, 0, 4);
 
-        addServiceToServiceProvider(serviceProvidersIds["Provider2"], "ServiceOfProvider2", 8, 0, 9);
-        addServiceToServiceProvider(serviceProvidersIds["Provider2"], "ServiceOfProvider2_2", 8, 0, 9);
+        addServiceToServiceProvider(1501011, "ServiceOfProvider2", 8, 0, 9);
+        addServiceToServiceProvider(1501011, "ServiceOfProvider2_2", 8, 0, 9);
 
-        addServiceToServiceProvider(serviceProvidersIds["Provider3"], "ServiceOfProvider3", 3, 0, 1);
-        addServiceToServiceProvider(serviceProvidersIds["Provider3"], "ServiceOfProvider3_2", 3, 0, 1);
-        
-
+        addServiceToServiceProvider(1501012, "ServiceOfProvider3", 3, 0, 1);
+        addServiceToServiceProvider(1501012, "ServiceOfProvider3_2", 3, 0, 1);
+    
     }
 }
 
