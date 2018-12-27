@@ -3,7 +3,9 @@ pragma solidity >=0.4.22 <0.6.0;
 contract Volunteer {
 
     struct Service {
-        uint id; 
+        uint id;
+        uint maxNum; // Max students who can enroll
+        uint currentNum; // Current enrolled students
         string name;
     }
 
@@ -28,10 +30,12 @@ contract Volunteer {
     uint public volunteeringsCount;
 
 
-    function addService (uint _id, string memory _name) private {
+    function addService (uint _id, uint _max, uint _current string memory _name) private {
         servicesCount ++;
         services.push(Service({
             id: _id,
+            maxNum: _max,
+            currentNum: _current,
             name: _name
         }));
     }
@@ -42,7 +46,7 @@ contract Volunteer {
             id: _id,
             name: _name
         }));
-        
+
     }
 
     function addVolunteering (uint studentID, uint serviceID) private {
@@ -61,14 +65,66 @@ contract Volunteer {
     }
 
     event EstablishVolunteering (
-        uint indexed _studentID, 
-        uint indexed _serviceID 
+        uint indexed _studentID,
+        uint indexed _serviceID
     );
 
     event ApproveVolunteeringCompletion(
         uint indexed _volunteeringID
     );
-    
+
+    // Setters
+
+    function setService(string name) public {
+      addService(services.length, name);
+    }
+
+    function setStudent(string name) public {
+      addStudent(students.length, name);
+    }
+
+    function setVolunteering(uint x, uint y) public {
+      addVolunteering(x,y);
+    }
+
+    // Getters
+
+    function getService(uint id) public view
+      returns(
+        uint,
+        string
+      ) {
+        return(
+          id,
+          services[id].maxNum,
+          services[id].currentNum,
+          services[id].name
+        );
+      }
+
+    function getStudent(uint id) public view
+      returns(
+        uint,
+        string
+      ) {
+        return(
+          id,
+          services[id].name
+        );
+      }
+
+    function getVolunteering(uint id) public view
+      returns(
+        uint,
+        uint,
+        string
+      ) {
+        return(
+          id,
+          services[id].name
+        );
+      }
+
 
     // Constructor
     constructor () public {
