@@ -2,12 +2,15 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Table, Button, Row, message, Icon } from 'antd';
 import CreateServiceModal from './CreateServiceModal';
+import EditableDetailsModal from './EditableDetailsModal';
 
 
 export default class ServicesTableForProvider extends Component {
   state = {
     loading: false,
     modalVisible: false,
+    creactServiceModalVisible: false,
+    chosenServiceIndex: 0,
     contract: null,
     services: [],
     columns: [
@@ -20,11 +23,14 @@ export default class ServicesTableForProvider extends Component {
       } },
       {
         title: 'Enroll', dataIndex: '', key: 'x', render: (text, record, index) => {
+          if (record.completed) {
+            return <span style={{ color: 'red', fontSize: 18 }}>Completed</span>
+          }
           if (record.usersCount !== record.max){
             return (
               <Row  type="flex" align="middle">
                 <Button type="primary" style={{ marginRight: 10 }} onClick={() => this.toggleModal(true, index)}>Edit</Button>
-                <Button type="info" style={{ marginRight: 10 }}>Complete</Button>
+                <Button type="info" style={{ marginRight: 10 }} onClick={() => this.completeService(record.id)}>Complete</Button>
               </Row>
             )
           }
@@ -41,10 +47,11 @@ export default class ServicesTableForProvider extends Component {
         values.serviceName,
         values.max,
         values.usersCount,
-        values.creditsAmount
+        values.creditAmount,
+        values.description
       ).send({ from: accounts[0] });
-      await  message.success('Successfully Created!')
-      await this.toggleModal(false);
+      this.toggleCreateServiceModal(false);
+      message.success('Successfully Created!')
       const tempData = [this.state.services, values];
       this.setState({ services: tempData });
       this.filterAndStoreUserServices();
@@ -54,6 +61,54 @@ export default class ServicesTableForProvider extends Component {
       message.error('Something went wrong! Please try again!')
     }
   }
+  completeService = async serviceId => {
+    const { web3: { contract, accounts }, user } = this.props;
+    try {
+      await contract.methods.completeService(serviceId).send({ from: accounts[0] });
+      const data = JSON.parse(JSON.stringify(this.state.services))
+      await data.map(service => {
+        if(service.id === serviceId) {
+          service.completed = true;
+        }
+      })
+      this.setState({ services: data });
+    } catch (Err) {
+      console.log(Err)
+    }
+  }
+
+  updateService = async values => {
+    const { web3: { contract, accounts }, user } = this.props;
+    try {
+      await contract.methods.editService(
+        values.id,
+        values.serviceName,
+        values.description,
+        values.max,
+        values.usersCount,
+        values.completed,
+        values.creditAmount,
+      ).send({ from: accounts[0] });
+      this.toggleModal(false, this.state.chosenServiceIndex);
+      message.success('Successfully Updated!')
+      const data = JSON.parse(JSON.stringify(this.state.services))
+      const tempData = data.map(service => {
+        if(service.id === values.id) {
+          return values;
+        }
+        return service;
+      })
+      console.log('tempData', tempData);
+      // const tempData = [this.state.services, values];
+      this.setState({ services: tempData });
+      this.filterAndStoreUserServices();
+    }
+    catch (err) {
+      console.error(err);
+      message.error('Something went wrong! Please try again!')
+    }
+  }
+
   async componentDidMount (){
     this.setState({ loading: true }); 
     await this.filterAndStoreUserServices();
@@ -62,7 +117,6 @@ export default class ServicesTableForProvider extends Component {
 
   filterAndStoreUserServices = async () => {
     const allServices = await this.fetchAllServices();
-    
     this.setState({ services:  allServices})
   }
 
@@ -74,7 +128,7 @@ export default class ServicesTableForProvider extends Component {
     await this.setState({ loading: false })
     for (let index = 0; index < servicesLength; index++) {
       const response = await contract.methods.getService(index).call();
-      console.log('response', response);
+      const description = await contract.methods.getServiceDescription(index).call();
       const payload = {
         id: response[0],
         max: response[1],
@@ -82,7 +136,8 @@ export default class ServicesTableForProvider extends Component {
         serviceName: response[3],
         completed: response[4],
         creditAmount: response[5],
-        userId: response[6]
+        userId: response[6],
+        description: description
       }
       if (user.userId === response[6]) {
         await allServices.push(payload);
@@ -91,16 +146,17 @@ export default class ServicesTableForProvider extends Component {
     return allServices;
   }
   
-  toggleModal = (bool) => this.setState({ modalVisible: bool });
+  toggleModal = (bool, index) => this.setState({ modalVisible: bool, chosenServiceIndex: index });
+  toggleCreateServiceModal = (bool) => this.setState({ creactServiceModalVisible: bool });
 
   render() {
-    const { modalVisible, columns, chosenServiceIndex, services, loading } = this.state;
+    const { modalVisible, creactServiceModalVisible, columns, chosenServiceIndex, services, loading } = this.state;
     return (
       <div>
         <Button
           type="primary"
           style={{ marginBottom: 10 }}
-          onClick={() => this.toggleModal(true)}
+          onClick={() => this.toggleCreateServiceModal(true)}
         >
           <Icon type="plus" /> Create Service
         </Button>
@@ -112,9 +168,16 @@ export default class ServicesTableForProvider extends Component {
           rowKey="id"
         />
         <CreateServiceModal
+          modalVisible={creactServiceModalVisible}
+          toggleModal={this.toggleCreateServiceModal}
+          createService={this.createService}
+        />
+        <EditableDetailsModal
           modalVisible={modalVisible}
           toggleModal={this.toggleModal}
-          createService={this.createService}
+          service={services[chosenServiceIndex]}
+          chosenServiceIndex={chosenServiceIndex}
+          updateService={this.updateService}
         />
       </div>
     )

@@ -38,7 +38,7 @@ const CreateServiceModal = props => {
         </Form.Item>
         <Form.Item label="Number of Credits:" required>
           {
-            getFieldDecorator('creditsAmount',{
+            getFieldDecorator('creditAmount',{
               rules: [{ required: true, message: 'Number of Credits is required' }],
               initialValue: ''
             })(

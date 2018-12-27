@@ -99,6 +99,7 @@ export default class ServicesTableForStudent extends Component {
     await this.setState({ loading: false })
     for (let index = 0; index < servicesLength; index++) {
       const response = await contract.methods.getService(index).call();
+      const description = await contract.methods.getServiceDescription(index).call();
       const providerAuthor = await contract.methods.serviceProviders(response[6]).call()
       const payload = {
         id: response[0],
@@ -108,9 +109,12 @@ export default class ServicesTableForStudent extends Component {
         completed: response[4],
         creditAmount: response[5],
         userId: response[6],
-        providerName: providerAuthor.name
+        providerName: providerAuthor.name,
+        description: description
       }
-      await allServices.push(payload);
+      if (!response[4]){
+        await allServices.push(payload);
+      }
     }
     return allServices;
   }

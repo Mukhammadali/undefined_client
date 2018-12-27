@@ -4,6 +4,7 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import { compose, lifecycle } from 'recompose'
 import { Error404 } from '../../../components';
 import ManageServices from '../../../views/ManageServices';
+import EnrolledStudents from '../../../views/EnrolledStudents';
 
 const ProviderRoutes = props => {
   const { role, user } = props;
@@ -15,8 +16,8 @@ const ProviderRoutes = props => {
       <Route exact path="/main/manage-services">
         <ManageServices user={user} title="Manage Services"/>
       </Route>
-      <Route exact path="/main/registered-students">
-        <div>Registered Students</div>
+      <Route exact path="/main/enrolled-students">
+        <EnrolledStudents user={user} title="Enrolled Students"/>
       </Route>
       <Route exact path="/main/option-2">
         <div>Option 3</div>

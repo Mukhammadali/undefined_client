@@ -5,6 +5,7 @@ import { compose, withHandlers } from 'recompose';
 
 const EditableDetailsModal = props => {
   const { modalVisible, service, toggleModal, chosenServiceIndex, form, onUpdate } = props;
+  console.log('chosenServiceIndex', chosenServiceIndex);
   const { getFieldDecorator } = form;
   if (!service) return null;
   return (
@@ -33,7 +34,17 @@ const EditableDetailsModal = props => {
               rules: [{ required: true, message: 'Max Number is required' }],
               initialValue: service.max
             })(
-              <StyledInput placeholder="Enter maximum number" />
+              <Input placeholder="Enter maximum number" />
+            )
+          }
+        </Form.Item>
+        <Form.Item label="Number of Credits:" required>
+          {
+            getFieldDecorator('creditAmount',{
+              rules: [{ required: true, message: 'Number of Credits is required' }],
+              initialValue: service.creditAmount
+            })(
+              <Input placeholder="Enter number of credits" />
             )
           }
         </Form.Item>
@@ -62,11 +73,11 @@ export default compose(
   Form.create(),
   withHandlers({
     onUpdate: props => async () => {
-      console.log('Clicked');
-      const { form, updateService } = props;
+      const { form, updateService, service } = props;
       await form.validateFields((formErr, values) => {
         if(!formErr) {
-          console.log({ values });
+          form.resetFields();
+          updateService({ ...service, ...values });
         }
       })
     }

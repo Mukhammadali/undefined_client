@@ -1,35 +1,37 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Table, Spin, Tag } from 'antd';
-
-
+import { Table, Spin, Tag, Row, Button } from 'antd';
 const columns = [
-  { title: 'Service Name', dataIndex: 'serviceName', key: 'serviceName', width: '50%' },
-  { title: 'Credit Amount', dataIndex: 'creditAmount', key: 'creditAmount' },
-  { title: 'No', dataIndex: 'usersCount', key: 'usersCount', render: (text, record, index) => {
-    return (
-      <span>{record.usersCount} / <b>{record.max}</b></span>
-    )
-  } },
-  { title: 'Author', dataIndex: 'providerName', key: 'providerName', render: (text, record, index) => {
-    return (
-      <span>{record.providerName}</span>
-    )
-  } },
+  { title: 'Student ID', dataIndex: 'userId', key: 'userId' },
+  { title: 'Service Name', dataIndex: 'serviceName', key: 'serviceName' },
   { title: 'Status', dataIndex: 'completed', key: 'completed', render: (text, { completed }) => {
     console.log('completed', completed);
     if(completed) return <Tag color="green">Completed</Tag>
     return <Tag color="blue">In Progress</Tag>
-
   } },
+  {
+    title: 'Complete', dataIndex: '', key: 'x', render: (text, record, index) => {
+      if (record.completed) {
+        return <span style={{ color: 'red', fontSize: 18 }}>Completed</span>
+      }
+      if (record.usersCount !== record.max){
+        return (
+          <Row  type="flex" align="middle">
+            <Button type="info" style={{ marginRight: 10 }} onClick={() => this.completeService(record.id)}>Complete</Button>
+          </Row>
+        )
+      }
+      return <span style={{ color: 'red', fontSize: 18 }}>Full</span>
+    },
+  },
 ];
 
 
-export default class ServicesList extends Component {
+export default class StudentList extends Component {
   state = {
     loading: false,
     contract: null,
-    services: []
+    volunteers: []
   }
 
   async componentDidMount (){
@@ -42,11 +44,33 @@ export default class ServicesList extends Component {
     const allServices = await this.fetchAllServices();
     const allVolunteerings = await this.fetchAllVolunteerings();
 
-    const filteredData = allServices.filter(service => {
-      const userExists = allVolunteerings.find(o => o.serviceId === service.id);
-      return userExists;
-    })
-    this.setState({ services:  filteredData})
+    const filteredData = [];
+    for (let index = 0; index < allVolunteerings.length; index++) {
+      const volunteer = allVolunteerings[index];
+      for (let j = 0; j < allServices.length; j++) {
+        const service = allServices[j];
+        if( volunteer.serviceId === service.id) {
+          const payload = {
+            ...volunteer,
+            serviceName: service.serviceName
+          }
+          filteredData.push(payload);
+        }
+        
+      }
+    }
+    //  allVolunteerings.filter(volunteering => {
+    //   allServices.map(o => {
+    //     if(o.id === volunteering.serviceId){
+    //       console.log('o', o);
+    //       volunteering.serviceName = o.serviceName;
+    //       return true;
+    //     }
+    //     return false;
+    //   });
+    // })
+    console.log('filteredData', filteredData);
+    this.setState({ volunteers:  filteredData})
   }
 
   fetchAllVolunteerings = async () => {
@@ -60,16 +84,13 @@ export default class ServicesList extends Component {
         serviceId: volunteering[1],
         completed: volunteering[2]
       }
-      if (volunteering[0] === user.userId) {
         allVolunteerings.push(payload);
-      }
-      
     }
     return allVolunteerings;
   }
 
   fetchAllServices = async () => {
-    const { web3: { contract } } = this.props;
+    const { web3: { contract }, user } = this.props;
     const servicesLength = await contract.methods.servicesCount().call()
 
     const allServices = [];
@@ -89,17 +110,20 @@ export default class ServicesList extends Component {
         providerName: providerAuthor.name,
         description: description
       }
-      await allServices.push(payload);
+      if (response[6] === user.userId){
+        await allServices.push(payload);
+      }
     }
     return allServices;
   }
 
   render() {
+    console.log(this.state.volunteers);
     return (
       <div>
         <Table
           columns={columns}
-          dataSource={this.state.services}
+          dataSource={this.state.volunteers}
           pagination={false}
           loading={this.state.loading}
           rowKey="id"
