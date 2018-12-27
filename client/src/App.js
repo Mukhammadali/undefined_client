@@ -35,7 +35,19 @@ class App extends Component {
   };
 
   render() {
-    if (!this.state.contract) return <Spin size="large" />
+    if (!this.state.contract) {
+      return (
+        <div style={{
+          display: 'flex',
+          flex: 1,
+          minHeight: '100vh',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <Spin size="large" />
+        </div>
+      )
+    }
     return (
       <AppContext.Provider value={this.state}>
         <Router />;

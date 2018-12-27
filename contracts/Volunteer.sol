@@ -252,4 +252,3 @@ contract Volunteer {
         addServiceToServiceProvider(serviceProvidersIds["Provider1"], "ServiceOfProvider1", 10, 0, 4);
         addServiceToServiceProvider(serviceProvidersIds["Provider1"], "ServiceOfProvider1_2", 10, 0, 4);
     }
-}

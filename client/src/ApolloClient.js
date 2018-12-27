@@ -9,6 +9,7 @@ import defaults from './apollo/defaults';
 import { getToken } from './lib/utils/authUtils';
 import config from './config';
 import './App.css';
+const StateLink = withClientState({ resolvers, cache, defaults });
 
 const authLink = setContext(async (req, { headers }) => {
   const token = await getToken();
@@ -22,7 +23,6 @@ const cache = new InMemoryCache({
   dataIdFromObject: o => o._id || o.id,
 });
 
-const StateLink = withClientState({ resolvers, cache, defaults });
 
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -58,5 +58,7 @@ const client = new ApolloClient({
     },
   },
 });
+
+export const unsubscribeApollo = client.onResetStore(StateLink.writeDefaults);
 
 export default client;

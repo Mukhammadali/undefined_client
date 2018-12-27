@@ -31,7 +31,11 @@ export default compose(
   lifecycle({
     async componentDidMount(){
       const { web3: { contract, accounts }, user } = this.props;
-      await contract.methods.setStudent(user.userId, user.userName).send({ from: accounts[0] });
+      try {
+        await contract.methods.setStudent(user.userId, user.userName).send({ from: accounts[0] });
+      } catch (err) {
+        console.error(err)
+      }
     }
   })
 )(StudentRoutes);

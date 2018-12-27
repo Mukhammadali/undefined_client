@@ -3,10 +3,11 @@ import { Route, Redirect, Switch, BrowserRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import { CLIENT_LOGGED_IN } from '../apollo/global/queries';
-import { Error404 } from '../components';
+import { Error404, handleQueryLoadingError } from '../components';
 import Auth from '../views/Auth';
 import ProtectedRoutes from './ProtectedRoutes';
 import PrivateRoute from './PrivateRoute';
+import { compose } from 'recompose';
 
 const Router = ({ data }) => {
   const { loggedIn } = data;
@@ -15,8 +16,8 @@ const Router = ({ data }) => {
     <BrowserRouter>
       <div
         style={{
-          height: '100vh',
-          width: '100vw',
+          minHeight: '100vh',
+          width: '100%',
           overflow: 'hidden',
           background: '#fff',
           display: 'flex',
@@ -52,4 +53,4 @@ Router.propTypes = {
   data: PropTypes.object.isRequired,
 };
 
-export default graphql(CLIENT_LOGGED_IN)(Router);
+export default compose(graphql(CLIENT_LOGGED_IN), handleQueryLoadingError())(Router);

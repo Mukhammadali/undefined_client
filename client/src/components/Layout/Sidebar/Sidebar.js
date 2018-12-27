@@ -59,6 +59,7 @@ const Sidebar = props => {
 
 
   const { role } = user;
+  console.log('user', user);
 
   let currentSidebarLinks = studentAllowedLinks;
   if (role === 'provider')
@@ -67,8 +68,6 @@ const Sidebar = props => {
   return (
     <Layout.Sider
       breakpoint="lg"
-      trigger={null}
-      collapsible
       width={260}
     >
       <UserName>
@@ -83,8 +82,8 @@ const Sidebar = props => {
             </NavLink>
           </StyledMenuItem>
         ))}
-        <StyledMenuItem key="logout">
-          <div onClick={onLogout}>
+        <StyledMenuItem key="logout" onClick={onLogout}>
+          <div>
             <Icon type="logout" />
             Log Out
           </div>
