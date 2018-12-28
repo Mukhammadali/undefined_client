@@ -78,6 +78,7 @@ export default class ServicesTableForStudent extends Component {
     const volunteeringsCount = await contract.methods.volunteeringsCount().call();
     for (let index = 0; index < volunteeringsCount; index++) {
       const volunteering = await contract.methods.getVolunteering(index).call()
+      console.log('volunteering', volunteering);
       const payload = {
         userId: volunteering[0],
         serviceId: volunteering[1],

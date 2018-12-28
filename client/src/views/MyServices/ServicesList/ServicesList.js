@@ -29,7 +29,7 @@ export default class ServicesList extends Component {
   state = {
     loading: false,
     contract: null,
-    services: []
+    myVolunteerings: []
   }
 
   async componentDidMount (){
@@ -42,11 +42,22 @@ export default class ServicesList extends Component {
     const allServices = await this.fetchAllServices();
     const allVolunteerings = await this.fetchAllVolunteerings();
 
-    const filteredData = allServices.filter(service => {
-      const userExists = allVolunteerings.find(o => o.serviceId === service.id);
-      return userExists;
-    })
-    this.setState({ services:  filteredData})
+    const filteredData = [];
+    for (let index = 0; index < allVolunteerings.length; index++) {
+      const volunteer = allVolunteerings[index];
+      for (let j = 0; j < allServices.length; j++) {
+        const service = allServices[j];
+        if( volunteer.serviceId === service.id) {
+          const payload = {
+            ...service,
+            completed: volunteer.completed
+          }
+          filteredData.push(payload);
+        }
+        
+      }
+    }
+    this.setState({ myVolunteerings:  filteredData})
   }
 
   fetchAllVolunteerings = async () => {
@@ -55,16 +66,18 @@ export default class ServicesList extends Component {
     const volunteeringsCount = await contract.methods.volunteeringsCount().call();
     for (let index = 0; index < volunteeringsCount; index++) {
       const volunteering = await contract.methods.getVolunteering(index).call()
+      console.log('volunteering', volunteering);
       const payload = {
         userId: volunteering[0],
         serviceId: volunteering[1],
         completed: volunteering[2]
       }
-      if (volunteering[0] === user.userId) {
+      if (user.userId === volunteering[0]) {
         allVolunteerings.push(payload);
       }
       
     }
+    console.log('allVolunteerings', allVolunteerings);
     return allVolunteerings;
   }
 
@@ -99,7 +112,7 @@ export default class ServicesList extends Component {
       <div>
         <Table
           columns={columns}
-          dataSource={this.state.services}
+          dataSource={this.state.myVolunteerings}
           pagination={false}
           loading={this.state.loading}
           rowKey="id"

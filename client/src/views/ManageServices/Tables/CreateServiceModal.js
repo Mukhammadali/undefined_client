@@ -75,6 +75,7 @@ export default compose(
       const { form, createService } = props;
       await form.validateFields((formErr, values) => {
         if(!formErr) {
+          form.resetFields();
           createService({...values, usersCount: 0 });
         }
       })

@@ -1,37 +1,35 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Table, Spin, Tag, Row, Button } from 'antd';
-const columns = [
-  { title: 'Student ID', dataIndex: 'userId', key: 'userId' },
-  { title: 'Service Name', dataIndex: 'serviceName', key: 'serviceName' },
-  { title: 'Status', dataIndex: 'completed', key: 'completed', render: (text, { completed }) => {
-    console.log('completed', completed);
-    if(completed) return <Tag color="green">Completed</Tag>
-    return <Tag color="blue">In Progress</Tag>
-  } },
-  {
-    title: 'Complete', dataIndex: '', key: 'x', render: (text, record, index) => {
-      if (record.completed) {
-        return <span style={{ color: 'red', fontSize: 18 }}>Completed</span>
-      }
-      if (record.usersCount !== record.max){
-        return (
-          <Row  type="flex" align="middle">
-            <Button type="info" style={{ marginRight: 10 }} onClick={() => this.completeService(record.id)}>Complete</Button>
-          </Row>
-        )
-      }
-      return <span style={{ color: 'red', fontSize: 18 }}>Full</span>
-    },
-  },
-];
 
 
 export default class StudentList extends Component {
   state = {
     loading: false,
     contract: null,
-    volunteers: []
+    volunteers: [],
+    columns: [
+      { title: 'Student ID', dataIndex: 'userId', key: 'userId' },
+      { title: 'Service Name', dataIndex: 'serviceName', key: 'serviceName' },
+      { title: 'Status', dataIndex: 'completed', key: 'completed', render: (text, { completed }) => {
+        console.log('completed', completed);
+        if(completed) return <Tag color="green">Completed</Tag>
+        return <Tag color="blue">In Progress</Tag>
+      } },
+      {
+        title: 'Complete', dataIndex: 'completed', key: 'completed', render: (text, record, index) => {
+          console.log('record', record);
+          if (record.completed) {
+            return <span style={{ color: 'red', fontSize: 18 }}>Completed</span>
+          }
+          return (
+            <Row  type="flex" align="middle">
+              <Button type="primary" style={{ marginRight: 10 }} onClick={() => this.completeVolunteering(record.volunteerId)}>Complete</Button>
+            </Row>
+          )
+        },
+      },
+    ]
   }
 
   async componentDidMount (){
@@ -59,17 +57,6 @@ export default class StudentList extends Component {
         
       }
     }
-    //  allVolunteerings.filter(volunteering => {
-    //   allServices.map(o => {
-    //     if(o.id === volunteering.serviceId){
-    //       console.log('o', o);
-    //       volunteering.serviceName = o.serviceName;
-    //       return true;
-    //     }
-    //     return false;
-    //   });
-    // })
-    console.log('filteredData', filteredData);
     this.setState({ volunteers:  filteredData})
   }
 
@@ -79,10 +66,12 @@ export default class StudentList extends Component {
     const volunteeringsCount = await contract.methods.volunteeringsCount().call();
     for (let index = 0; index < volunteeringsCount; index++) {
       const volunteering = await contract.methods.getVolunteering(index).call()
+      console.log('volunteering', volunteering);
       const payload = {
         userId: volunteering[0],
         serviceId: volunteering[1],
-        completed: volunteering[2]
+        completed: volunteering[2],
+        volunteerId: volunteering[3]
       }
         allVolunteerings.push(payload);
     }
@@ -116,17 +105,33 @@ export default class StudentList extends Component {
     }
     return allServices;
   }
+  completeVolunteering = async volunteerId => {
+    console.log('volunteerId', volunteerId);
+    const { web3: { contract, accounts }, user } = this.props;
+    try {
+      await contract.methods.completeVolunteering(volunteerId).send({ from: accounts[0] });
+      const data = JSON.parse(JSON.stringify(this.state.volunteers))
+      await data.map(volunteer => {
+        if(volunteer.volunteerId === volunteerId) {
+          volunteer.completed = true;
+        }
+      })
+      this.setState({ volunteers: data });
+      this.filterAndStoreUserServices();
+    } catch (Err) {
+      console.log(Err)
+    }
+  }
 
   render() {
-    console.log(this.state.volunteers);
     return (
       <div>
         <Table
-          columns={columns}
+          columns={this.state.columns}
           dataSource={this.state.volunteers}
           pagination={false}
           loading={this.state.loading}
-          rowKey="id"
+          rowKey="volunteerId"
         />
       </div>
     )
